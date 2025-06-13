@@ -44,7 +44,11 @@ void RACHEL::Setup()
     rachel_app_install_callback(_mooncake);
 
     // Create launcher
-    _mooncake->createApp(launcher);
+    //_mooncake->createApp(launcher);
+
+    // 直接启动应用
+    auto bangboo_packer = new MOONCAKE::APPS::AppBangboo_Packer;
+    _mooncake->createAndStartApp(bangboo_packer);
 }
 
 void RACHEL::Loop() { _mooncake->update(); }

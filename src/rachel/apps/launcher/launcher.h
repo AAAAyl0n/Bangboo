@@ -41,6 +41,12 @@ namespace MOONCAKE::APPS
 
             // App open and close anim
             LVGL::Anim_Path app_anim;
+            
+            // Auto startup
+            bool auto_startup_enabled = true;
+            uint32_t auto_startup_delay = 5000;  // 5秒后自动启动
+            uint32_t startup_time = 0;
+            std::string auto_startup_app_name = "Bangboo";  // 要自动启动的app名称
         };
         Data_t _data;
         void _update_clock(bool updateNow = false);

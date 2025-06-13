@@ -82,11 +82,11 @@ void HAL_Rachel::_disp_init()
 }
 
 static const std::string _logo = R"(
-    ____  ___   ________  __________
-   / __ \/   | / ____/ / / / ____/ /
-  / /_/ / /| |/ /   / /_/ / __/ / /
- / _, _/ ___ / /___/ __  / /___/ /___
-/_/ |_/_/  |_\____/_/ /_/_____/_____/
+          ____        ___ ___  
+         | __ )      |_ _/ _ \ 
+         |  _ \       | | | | |
+         | |_) |  _   | | |_| |
+         |____/  (_) |___\___/ 
 )";
 
 void HAL_Rachel::_disp_logo()
@@ -100,7 +100,8 @@ void HAL_Rachel::_disp_logo()
         if (i % 20 == 0)
             _canvas->pushSprite(0, 0);
     }
-    _canvas->printf("\n- @author Forairaaaaa\n");
+    _canvas->printf("\n- @\"Mooncake\" author Forairaaaaa\n");
+    _canvas->printf("\n- @Developer Bowen\n");
     _canvas->printf("\n- @build at %s %s\n\n", __TIME__, __DATE__);
     _canvas->pushSprite(0, 0);
 }
