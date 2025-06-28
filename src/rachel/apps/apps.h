@@ -19,6 +19,7 @@
 #include "app_ble_gamepad/app_ble_gamepad.h"
 #include "app_nofrendo/app_nofrendo.h"
 #include "app_bangboo/app_bangboo.h"
+#include "app_timeview/app_timeview.h"
 /* Header files locator(Don't remove) */
 
 void rachel_app_install_callback(MOONCAKE::Mooncake* mooncake)
@@ -31,5 +32,6 @@ void rachel_app_install_callback(MOONCAKE::Mooncake* mooncake)
     mooncake->installApp(new MOONCAKE::APPS::AppMusic_Packer);
     mooncake->installApp(new MOONCAKE::APPS::AppGenshin_Packer);
     mooncake->installApp(new MOONCAKE::APPS::AppBangboo_Packer);
+    mooncake->installApp(new MOONCAKE::APPS::AppTimeview_Packer);
     /* Install app locator(Don't remove) */
 }

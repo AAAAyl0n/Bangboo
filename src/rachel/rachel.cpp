@@ -47,6 +47,9 @@ void RACHEL::Setup()
     //_mooncake->createApp(launcher);
 
     // 直接启动应用
+    //auto timeview_packer = new MOONCAKE::APPS::AppTimeview_Packer;
+    //_mooncake->createAndStartApp(timeview_packer);
+
     auto bangboo_packer = new MOONCAKE::APPS::AppBangboo_Packer;
     _mooncake->createAndStartApp(bangboo_packer);
 }

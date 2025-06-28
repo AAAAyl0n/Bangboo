@@ -10,7 +10,7 @@
  */
 #include "../app_settings.h"
 #include "../../../hal/hal.h"
-#include "../assets/page_about_png.hpp"
+#include "../assets/page_about_png.hpp" 
 
 using namespace MOONCAKE::APPS;
 
