@@ -9,6 +9,8 @@
  *
  */
 #include "lgfx_fx.h"
+#include <algorithm>
+#include <cmath>
 
 void LGFX_SpriteFx::drawFastHLineInDifference(int32_t x, int32_t y, int32_t w)
 {
@@ -141,4 +143,176 @@ void LGFX_SpriteFx::fillSmoothRoundRectInDifference(int32_t x, int32_t y, int32_
         drawFastHLineInDifference(x + cx - r, y - cy + r + h, 2 * (r - cx) + 1 + w);
     }
     endWrite();
+}
+
+// 辅助函数：计算点到直线的距离
+float LGFX_SpriteFx::pointToLineDistance(int32_t px, int32_t py, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    // 计算直线方程 Ax + By + C = 0
+    float A = y2 - y1;
+    float B = x1 - x2;
+    float C = x2 * y1 - x1 * y2;
+    
+    // 避免除零错误
+    float denominator = sqrt(A * A + B * B);
+    if (denominator < 0.001f) return 0.0f;
+    
+    // 点到直线距离公式: |Ax + By + C| / sqrt(A² + B²)
+    float distance = abs(A * px + B * py + C) / denominator;
+    return distance;
+}
+
+// 辅助函数：判断点是否在三角形内部（使用重心坐标法）
+bool LGFX_SpriteFx::isPointInTriangle(int32_t px, int32_t py, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    return isPointInTriangle((float)px, (float)py, (float)x0, (float)y0, (float)x1, (float)y1, (float)x2, (float)y2);
+}
+
+// 支持浮点数的版本
+bool LGFX_SpriteFx::isPointInTriangle(float px, float py, float x0, float y0, float x1, float y1, float x2, float y2)
+{
+    // 使用叉积方法判断点是否在三角形内部
+    auto sign = [](float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) -> float {
+        return (p1x - p3x) * (p2y - p3y) - (p2x - p3x) * (p1y - p3y);
+    };
+
+    float d1 = sign(px, py, x0, y0, x1, y1);
+    float d2 = sign(px, py, x1, y1, x2, y2);
+    float d3 = sign(px, py, x2, y2, x0, y0);
+
+    bool has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+    bool has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+    return !(has_neg && has_pos);
+}
+
+// 更精确的抗锯齿计算：使用超采样方法
+float LGFX_SpriteFx::calculateTriangleAlpha(int32_t px, int32_t py, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    // 默认使用4x4采样获得高质量抗锯齿效果
+    return calculateTriangleAlpha(px, py, x0, y0, x1, y1, x2, y2, 4);
+}
+
+// 填充平滑三角形函数
+void LGFX_SpriteFx::fillSmoothTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    // 找到三角形的边界矩形
+    int32_t minX = std::min({x0, x1, x2}) - 1;
+    int32_t maxX = std::max({x0, x1, x2}) + 1;
+    int32_t minY = std::min({y0, y1, y2}) - 1;
+    int32_t maxY = std::max({y0, y1, y2}) + 1;
+    
+    // 限制在屏幕范围内
+    minX = std::max(minX, _clip_l);
+    maxX = std::min(maxX, _clip_r);
+    minY = std::max(minY, _clip_t);
+    maxY = std::min(maxY, _clip_b);
+    
+    uint32_t rgb888 = _write_conv.revert_rgb888(_color.raw);
+    
+    startWrite();
+    
+    // 对每个像素进行精确的覆盖度计算
+    for (int32_t y = minY; y <= maxY; y++) {
+        for (int32_t x = minX; x <= maxX; x++) {
+            float alpha = calculateTriangleAlpha(x, y, x0, y0, x1, y1, x2, y2);
+            
+            if (alpha > 0.001f) {  // 有覆盖
+                if (alpha >= 0.999f) {
+                    // 完全覆盖，直接绘制
+                    writePixel(x, y);
+                } else {
+                    // 部分覆盖，使用alpha混合
+                    uint8_t alphaValue = (uint8_t)(alpha * 255);
+                    fillRectAlpha(x, y, 1, 1, alphaValue, rgb888);
+                }
+            }
+        }
+    }
+    
+    endWrite();
+}
+
+// 带颜色参数的重载版本：填充平滑三角形
+void LGFX_SpriteFx::fillSmoothTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t color)
+{
+    setColor(color);
+    fillSmoothTriangle(x0, y0, x1, y1, x2, y2);
+}
+
+// 可调采样精度的alpha计算函数
+float LGFX_SpriteFx::calculateTriangleAlpha(int32_t px, int32_t py, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int samples)
+{
+    const float step = 1.0f / samples;
+    const float offset = step * 0.5f;
+    
+    int inside_count = 0;
+    int total_samples = samples * samples;
+    
+    // 将整数坐标转换为浮点数
+    float fx0 = (float)x0, fy0 = (float)y0;
+    float fx1 = (float)x1, fy1 = (float)y1;
+    float fx2 = (float)x2, fy2 = (float)y2;
+    
+    // 对像素内的多个采样点进行检测
+    for (int sy = 0; sy < samples; sy++) {
+        for (int sx = 0; sx < samples; sx++) {
+            float sample_x = px + offset + sx * step;
+            float sample_y = py + offset + sy * step;
+            
+            // 检查采样点是否在三角形内部
+            if (isPointInTriangle(sample_x, sample_y, fx0, fy0, fx1, fy1, fx2, fy2)) {
+                inside_count++;
+            }
+        }
+    }
+    
+    return (float)inside_count / (float)total_samples;
+}
+
+// 高性能版本：使用2x2采样的平滑三角形
+void LGFX_SpriteFx::fillSmoothTriangleFast(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    // 找到三角形的边界矩形
+    int32_t minX = std::min({x0, x1, x2}) - 1;
+    int32_t maxX = std::max({x0, x1, x2}) + 1;
+    int32_t minY = std::min({y0, y1, y2}) - 1;
+    int32_t maxY = std::max({y0, y1, y2}) + 1;
+    
+    // 限制在屏幕范围内
+    minX = std::max(minX, _clip_l);
+    maxX = std::min(maxX, _clip_r);
+    minY = std::max(minY, _clip_t);
+    maxY = std::min(maxY, _clip_b);
+    
+    uint32_t rgb888 = _write_conv.revert_rgb888(_color.raw);
+    
+    startWrite();
+    
+    // 对每个像素进行2x2采样（更快但质量稍低）
+    for (int32_t y = minY; y <= maxY; y++) {
+        for (int32_t x = minX; x <= maxX; x++) {
+            float alpha = calculateTriangleAlpha(x, y, x0, y0, x1, y1, x2, y2, 2);  // 2x2采样
+            
+            if (alpha > 0.001f) {  // 有覆盖
+                if (alpha >= 0.999f) {
+                    // 完全覆盖，直接绘制
+                    writePixel(x, y);
+                } else {
+                    // 部分覆盖，使用alpha混合
+                    uint8_t alphaValue = (uint8_t)(alpha * 255);
+                    fillRectAlpha(x, y, 1, 1, alphaValue, rgb888);
+                }
+            }
+        }
+    }
+    
+    endWrite();
+}
+
+// 带颜色参数的高性能版本
+void LGFX_SpriteFx::fillSmoothTriangleFast(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t color)
+{
+    setColor(color);
+    fillSmoothTriangleFast(x0, y0, x1, y1, x2, y2);
 }

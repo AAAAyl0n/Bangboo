@@ -187,9 +187,9 @@ void AppTimeview::onRunning()
         HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
         HAL::GetCanvas()->setTextColor(THEME_COLOR_LawnGreen);
         HAL::GetCanvas()->setTextSize(1);
-        HAL::GetCanvas()->drawCenterString(date_buffer, 120, 43);
+        HAL::GetCanvas()->drawCenterString(date_buffer, 120, 40);
         HAL::GetCanvas()->setTextSize(2);
-        HAL::GetCanvas()->drawCenterString(time_buffer, 120, 69);
+        HAL::GetCanvas()->drawCenterString(time_buffer, 120, 66);
         HAL::CanvasUpdate();
 
         HAL::Delay(1000);

@@ -78,8 +78,36 @@ void Launcher::_create_menu()
 
 void Launcher::_update_menu()
 {
+    
     if ((HAL::Millis() - _data.menu_update_count) > _data.menu_update_interval)
     {
+        // 添加自动启动逻辑 - 模拟点击 Bangboo 应用
+        static bool auto_launch_executed = false;
+        static uint32_t launcher_start_time = 0;
+        
+        // 记录 launcher 开始时间
+        if (launcher_start_time == 0) {
+            launcher_start_time = HAL::Millis();
+        }
+        
+        // 在 launcher 显示 2 秒后自动启动 Bangboo 应用
+        if (!auto_launch_executed && (HAL::Millis() - launcher_start_time) > 3000) {
+            auto_launch_executed = true;
+            
+            // 查找 Bangboo 应用
+            auto app_list = mcAppGetFramework()->getInstalledAppList();
+            for (size_t i = 1; i < app_list.size(); i++) { // 跳过 launcher (index 0)
+                if (app_list[i]->getAppName() == "Bangboo") {
+                    
+                    if (mcAppGetFramework()->createAndStartApp(app_list[i])) {
+                        spdlog::info("app: {} auto opened", app_list[i]->getAppName());
+                        closeApp();
+                        return; // 启动成功后直接返回
+                    }
+                    break;
+                }
+            }
+        }
         // Update navigation
         // To last one
         if (HAL::GetButton(GAMEPAD::BTN_LEFT))

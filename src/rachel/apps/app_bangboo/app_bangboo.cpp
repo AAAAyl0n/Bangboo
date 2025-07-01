@@ -16,17 +16,15 @@
 
 using namespace MOONCAKE::APPS;
 
+// 邦布眼睛颜色
+static const auto BANGBOO_EYE_COLOR = THEME_COLOR_LawnGreen;
+
 static void drawEyes()
 {
     HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
-    //HAL::GetCanvas()->fillCircle(60, 91, 32, THEME_COLOR_LawnGreen);
-    //HAL::GetCanvas()->fillCircle(60, 91, 21, THEME_COLOR_BLACK);
-
-    //HAL::GetCanvas()->fillCircle(180, 91, 32, THEME_COLOR_LawnGreen);
-    //HAL::GetCanvas()->fillCircle(180, 91, 21, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillSmoothCircle(60, 91, 32, THEME_COLOR_LawnGreen);
+    HAL::GetCanvas()->fillSmoothCircle(60, 91, 32, BANGBOO_EYE_COLOR);
     HAL::GetCanvas()->fillSmoothCircle(60, 91, 21, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillSmoothCircle(180, 91, 32, THEME_COLOR_LawnGreen);
+    HAL::GetCanvas()->fillSmoothCircle(180, 91, 32, BANGBOO_EYE_COLOR);
     HAL::GetCanvas()->fillSmoothCircle(180, 91, 21, THEME_COLOR_BLACK);
     HAL::CanvasUpdate();
 }
@@ -34,7 +32,7 @@ static void drawEyes()
 static void drawSmile()
 {
     HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
-    HAL::GetCanvas()->setColor(THEME_COLOR_LawnGreen); 
+    HAL::GetCanvas()->setColor(BANGBOO_EYE_COLOR); 
     HAL::GetCanvas()->fillArc(60, 150, 61, 71, 241, 299);
     HAL::GetCanvas()->fillArc(180, 150, 61, 71, 241, 299);
     HAL::CanvasUpdate();
@@ -43,14 +41,17 @@ static void drawSmile()
 static void drawAnger()
 {
     HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
-    HAL::GetCanvas()->setColor(THEME_COLOR_LawnGreen);
-    HAL::GetCanvas()->fillSmoothCircle(60, 91, 32, THEME_COLOR_LawnGreen);
+    HAL::GetCanvas()->setColor(BANGBOO_EYE_COLOR);
+    HAL::GetCanvas()->fillSmoothCircle(60, 91, 32, BANGBOO_EYE_COLOR);
     HAL::GetCanvas()->fillSmoothCircle(60, 91, 21, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillSmoothCircle(180, 91, 32, THEME_COLOR_LawnGreen);
+    HAL::GetCanvas()->fillSmoothCircle(180, 91, 32, BANGBOO_EYE_COLOR);
     HAL::GetCanvas()->fillSmoothCircle(180, 91, 21, THEME_COLOR_BLACK);
     
-    HAL::GetCanvas()->fillTriangle(0, 30, 60, 91, 150, 91, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillTriangle(240, 30, 180, 91, 90, 91, THEME_COLOR_BLACK);
+    //HAL::GetCanvas()->fillSmoothTriangle(20, 68, 100, 93, 70, 0, THEME_COLOR_BLACK);
+    //HAL::GetCanvas()->fillSmoothTriangle(220, 68, 140, 93, 170, 0, THEME_COLOR_BLACK);
+
+    HAL::GetCanvas()->fillSmoothTriangle(0, 30, 60, 91, 150, 91, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(240, 30, 180, 91, 90, 91, THEME_COLOR_BLACK);
 
 
     //HAL::GetCanvas()->fillArc(60, 91, 21, 32, 0, 225);
@@ -61,39 +62,39 @@ static void drawAnger()
 static void drawSad()
 {
     HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
-    HAL::GetCanvas()->setColor(THEME_COLOR_LawnGreen);
-    HAL::GetCanvas()->fillSmoothCircle(60, 91, 32, THEME_COLOR_LawnGreen);
+    HAL::GetCanvas()->setColor(BANGBOO_EYE_COLOR);
+    HAL::GetCanvas()->fillSmoothCircle(60, 91, 32, BANGBOO_EYE_COLOR);
     HAL::GetCanvas()->fillSmoothCircle(60, 91, 21, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillSmoothCircle(180, 91, 32, THEME_COLOR_LawnGreen);
+    HAL::GetCanvas()->fillSmoothCircle(180, 91, 32, BANGBOO_EYE_COLOR);
     HAL::GetCanvas()->fillSmoothCircle(180, 91, 21, THEME_COLOR_BLACK);
     
-    HAL::GetCanvas()->fillTriangle(20, 91, 50, 0, 100, 70, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillTriangle(220, 91, 190, 0, 140, 70, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(20, 91, 50, 0, 100, 70, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(220, 91, 190, 0, 140, 70, THEME_COLOR_BLACK);
 
     HAL::CanvasUpdate();
 }
 
 static void drawWince(){
     HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
-    HAL::GetCanvas()->setColor(THEME_COLOR_LawnGreen);
+    HAL::GetCanvas()->setColor(BANGBOO_EYE_COLOR);
 
-    HAL::GetCanvas()->fillTriangle(95, 91, 33, 55, 33, 127, THEME_COLOR_LawnGreen);
-    HAL::GetCanvas()->fillTriangle(73, 91, 33, 67.72, 33, 114.28, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillTriangle(145, 91, 207, 55, 207, 127, THEME_COLOR_LawnGreen);
-    HAL::GetCanvas()->fillTriangle(167, 91, 207, 67.72, 207, 114.28, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(95, 91, 33, 55, 33, 127, BANGBOO_EYE_COLOR);
+    HAL::GetCanvas()->fillSmoothTriangle(73, 91, 33, 67.72, 33, 114.28, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(145, 91, 207, 55, 207, 127, BANGBOO_EYE_COLOR);
+    HAL::GetCanvas()->fillSmoothTriangle(167, 91, 207, 67.72, 207, 114.28, THEME_COLOR_BLACK);
 
-    HAL::GetCanvas()->fillTriangle(33, 70, 33, 55, 53, 55, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillTriangle(33, 112, 33, 127, 53, 127, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillTriangle(207, 70, 207, 55, 187, 55, THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillTriangle(207, 112, 207, 127, 187, 127, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(33, 70, 33, 55, 53, 55, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(33, 112, 33, 127, 53, 127, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(207, 70, 207, 55, 187, 55, THEME_COLOR_BLACK);
+    HAL::GetCanvas()->fillSmoothTriangle(207, 112, 207, 127, 187, 127, THEME_COLOR_BLACK);
     HAL::CanvasUpdate();
 }
 
 static void drawBlink()
 {
     HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
-    HAL::GetCanvas()->fillRect(29, 86, 64, 11, THEME_COLOR_LawnGreen);
-    HAL::GetCanvas()->fillRect(149, 86, 64, 11, THEME_COLOR_LawnGreen);
+    HAL::GetCanvas()->fillSmoothRoundRect(29, 86, 64, 11, 2, BANGBOO_EYE_COLOR);
+    HAL::GetCanvas()->fillSmoothRoundRect(149, 86, 64, 11, 2, BANGBOO_EYE_COLOR);
     
     HAL::CanvasUpdate();
 }
@@ -108,7 +109,7 @@ void AppBangboo::onResume() { spdlog::info("{} onResume", getAppName()); }
 // Like loop()...
 void AppBangboo::onRunning()
 {
-    
+    //HAL::RenderFpsPanel();
     //HAL::GetCanvas()->drawPng(page_about_png_test, page_about_png_test_size);
     //HAL::CanvasUpdate();
     //HAL::Delay(1000); 
@@ -116,8 +117,8 @@ void AppBangboo::onRunning()
     //drawBlink();
     HAL::Delay(3000); 
 
-    drawWince();    
-    HAL::Delay(3000);
+    //drawWince();    
+    //HAL::Delay(3000);
     
     // Blink animation loop
     for (int i = 0; i < 100; i++){

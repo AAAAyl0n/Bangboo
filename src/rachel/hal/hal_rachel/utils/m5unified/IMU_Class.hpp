@@ -40,7 +40,7 @@ namespace m5
 
         struct imu_data_t
         {
-            uint32_t usec;
+            uint32_t usec;//microseconds 存储微妙级别时间戳
             union
             {
                 float value[9];

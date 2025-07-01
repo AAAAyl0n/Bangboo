@@ -46,8 +46,8 @@ void HAL_Rachel::loadTextFont24()
 
 void HAL_Rachel::loadTextFont16()
 {
-    // _canvas->setFont(&fonts::efontCN_16);
-    // _canvas->setTextSize(1);
+     _canvas->setFont(&fonts::efontCN_16);
+     _canvas->setTextSize(1);
 }
 
 void HAL_Rachel::loadLauncherFont24()

@@ -95,8 +95,8 @@ namespace m5
 
     bool BMI270_Class::auxWriteRegister8(std::uint8_t reg, std::uint8_t data)
     {
-        writeRegister8(AUX_WR_DATA_ADDR, data); // AUXセンサに書き込む値
-        writeRegister8(AUX_WR_ADDR, reg);       // AUXセンサに書き込むレジスタ番号
+        writeRegister8(AUX_WR_DATA_ADDR, data); // 写入AUX传感器的值  
+        writeRegister8(AUX_WR_ADDR, reg);       // 写入AUX传感器的寄存器地址
         int retry = 3;
         while ((readRegister8(STATUS_ADDR) & 0b100) && --retry)
         {
@@ -108,7 +108,7 @@ namespace m5
     std::uint8_t BMI270_Class::auxReadRegister8(std::uint8_t reg)
     {
         writeRegister8(AUX_IF_CONF_ADDR, 0x80); // enable read write. Burst length 1
-        writeRegister8(AUX_RD_ADDR, reg);       // AUXセンサから読み取るレジスタ番号
+        writeRegister8(AUX_RD_ADDR, reg);       // 从AUX传感器读取寄存器地址
         int retry = 3;
         while ((readRegister8(STATUS_ADDR) & 0b100) && --retry)
         {
