@@ -37,6 +37,7 @@ private:
     void _sdcard_init();
     void _gamepad_init();
     void _adjust_sys_time();
+    void _calibrateRTCWithCompileTime();
     void _system_config_init();
     void _sum_up();
 

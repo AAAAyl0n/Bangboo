@@ -44,11 +44,32 @@ public:
         // HAL::GetCanvas()->fillRect(0, 0, 240, 24, THEME_COLOR_LIGHT);
 
         // With anim
+        // _anim_value_buffer = statusBarAnim.getValue(HAL::Millis());
+        // HAL::GetCanvas()->fillRect(0, 0, 240, _anim_value_buffer, THEME_COLOR_NIGHT);
+        // HAL::GetCanvas()->setTextSize(2);
+        // HAL::GetCanvas()->setTextColor(TFT_WHITE, THEME_COLOR_NIGHT);
+        // HAL::GetCanvas()->drawCenterString(_clock->c_str(), 120, _anim_value_buffer - 19, &fonts::Font0);
+        // HAL::GetCanvas()->setTextSize(1);
+
+        // With anim - 圆角矩形包裹时间
         _anim_value_buffer = statusBarAnim.getValue(HAL::Millis());
-        HAL::GetCanvas()->fillRect(0, 0, 240, _anim_value_buffer, THEME_COLOR_LIGHT);
-        HAL::GetCanvas()->setTextSize(2);
-        HAL::GetCanvas()->drawCenterString(_clock->c_str(), 120, _anim_value_buffer - 19, &fonts::Font0);
-        HAL::GetCanvas()->setTextSize(1);
+        if (_anim_value_buffer > 0) {
+            // 计算圆角矩形尺寸
+            int rect_width = 70;  // 适应大字体的宽度
+            int rect_height = 24; // 适应大字体的高度
+            int rect_x = (240 - rect_width) / 2; // 居中
+            // 使用动画值控制下滑效果，顶住屏幕顶部
+            int rect_y = 5 - rect_height + (_anim_value_buffer * rect_height / 24); // 从上方滑下，最终y=0
+
+            // 绘制圆角矩形背景
+            HAL::GetCanvas()->fillSmoothRoundRect(rect_x, rect_y, rect_width, rect_height, 8, THEME_COLOR_NIGHT);
+            
+            // 绘制时间文字
+            HAL::GetCanvas()->setTextSize(2);
+            HAL::GetCanvas()->setTextColor(TFT_WHITE, THEME_COLOR_NIGHT);
+            HAL::GetCanvas()->drawCenterString(_clock->c_str(), 120, rect_y + 4, &fonts::Font0);
+        }
+
         /* --------------------------------------------------------------------------------------------- */
 
         // Render bottom panel
@@ -68,7 +89,7 @@ public:
         for (const auto& item : menuItemList)
         {
             // Get y offset, lower the unselected one
-            _y_offset = std::abs(selector.x - item->x) / 3;
+            _y_offset = std::abs(selector.x - item->x) / 8;
 
             // Render icon
             HAL::GetCanvas()->pushImage(item->x + _x_offset,
@@ -80,16 +101,24 @@ public:
             // If is the selected one
             if (item->id == selector.targetItem)
             {
-                // Render app name
-                HAL::GetCanvas()->setTextColor(THEME_COLOR_DARK, THEME_COLOR_LIGHT);
-                // HAL::GetCanvas()->drawCenterString(
-                //     item->tag.c_str(),
-                //     120,
-                //     THEME_APP_NAME_MARGIN_TOP
-                // );
+                // // Render app name
+                // HAL::GetCanvas()->setTextColor(THEME_COLOR_DARK, THEME_COLOR_LIGHT);
+                // // HAL::GetCanvas()->drawCenterString(
+                // //     item->tag.c_str(),
+                // //     120,
+                // //     THEME_APP_NAME_MARGIN_TOP
+                // // );
 
-                // With anim
-                HAL::GetCanvas()->drawCenterString(item->tag.c_str(), 120, _anim_value_buffer + 15);
+                // // With anim
+                // HAL::GetCanvas()->drawCenterString(item->tag.c_str(), 120, _anim_value_buffer + 15);
+                HAL::GetCanvas()->setTextColor(TFT_WHITE);
+                HAL::GetCanvas()->setTextSize(1);
+                HAL::GetCanvas()->drawCenterString(
+                    item->tag.c_str(), 
+                    120, 
+                    THEME_APP_ICON_MARGIN_TOP + THEME_APP_ICON_HEIGHT + 6,
+                    &fonts::Font0
+                );
             }
         }
         /* --------------------------------------------------------------------------------------------- */

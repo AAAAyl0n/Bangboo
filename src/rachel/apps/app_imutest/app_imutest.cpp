@@ -17,7 +17,7 @@
 
 using namespace MOONCAKE::APPS;
 
-static const auto BANGBOO_EYE_COLOR = THEME_COLOR_LawnGreen;
+static const auto BANGBOO_EYE_COLOR = THEME_COLOR_YELLOW;
 
 static void drawEyes()
 {
@@ -76,6 +76,12 @@ void AppImutest::onRunning()
     
     while (true)
     {
+        // 检查按键SELECT退出
+        if (HAL::GetButton(GAMEPAD::BTN_SELECT)) {
+            destroyApp();
+            return;
+        }
+        
         // 更新IMU数据
         HAL::UpdateImuData();
         
