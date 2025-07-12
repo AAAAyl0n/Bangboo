@@ -24,6 +24,7 @@ void HAL_Rachel::_calibrateRTCWithCompileTime()
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         nvs_flash_erase();
         nvs_flash_init();
+        //test4
     }
 
     nvs_handle_t nvs_handle;

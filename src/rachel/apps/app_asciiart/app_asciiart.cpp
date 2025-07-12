@@ -40,7 +40,13 @@ void AppAsciiart::onResume()
     _data.pattern_type = 0;
     _data.last_update_time = HAL::Millis();
     _data.last_button_time = 0;
+    _data.last_clock_update = 0;
     _data.start_time = HAL::Millis(); // 记录启动时间
+    
+    // 初始化时间显示
+    auto time_now = HAL::GetLocalTime();
+    strftime(_data.date_buffer, sizeof(_data.date_buffer), "%a %d", time_now);
+    strftime(_data.time_buffer, sizeof(_data.time_buffer), "%H:%M", time_now);
 }
 
 // chaos 模式的数学函数
@@ -143,7 +149,7 @@ void AppAsciiart::onRunning()
 {
     unsigned long current_time = HAL::Millis();
     
-    // 检查按键输入 (A键切换模式)
+    // 检查按键输入 (START键切换模式)
     if (HAL::GetButton(GAMEPAD::BTN_START) && 
         (current_time - _data.last_button_time > _data.button_debounce)) {
         _data.pattern_type = (_data.pattern_type + 1) % 2;
@@ -152,7 +158,7 @@ void AppAsciiart::onRunning()
         spdlog::info("切换到模式: {}", _data.pattern_type == 0 ? "chaos" : "waves");
     }
     
-    // 检查按键B退出
+    // 检查按键SELECT退出
     if (HAL::GetButton(GAMEPAD::BTN_SELECT)) {
         destroyApp();
         return;
@@ -168,17 +174,30 @@ void AppAsciiart::onRunning()
         drawAsciiArt();
         
         // 在下半部分显示按键提示信息
-        int bottom_area_y = 120;
+        int bottom_area_y = 110; // 调整位置为时间显示留空间
         const char* mode_name = (_data.pattern_type == 0) ? "chaos" : "waves";
         
-        HAL::GetCanvas()->setCursor(10, bottom_area_y + 20);
+        HAL::GetCanvas()->setCursor(10, bottom_area_y + 10);
         HAL::GetCanvas()->printf("Mode: %s", mode_name);
         
-        HAL::GetCanvas()->setCursor(10, bottom_area_y + 40);
-        HAL::GetCanvas()->print("A: Switch Mode");
+        HAL::GetCanvas()->setCursor(10, bottom_area_y + 25);
+        HAL::GetCanvas()->print("A: Switch  SELECT: Exit");
         
-        HAL::GetCanvas()->setCursor(10, bottom_area_y + 60);
-        HAL::GetCanvas()->print("B: Exit");
+        // 更新时间缓存 (只在需要时更新)
+        if (current_time - _data.last_clock_update >= _data.clock_update_interval) {
+            auto time_now = HAL::GetLocalTime();
+            strftime(_data.date_buffer, sizeof(_data.date_buffer), "%a %d", time_now);
+            strftime(_data.time_buffer, sizeof(_data.time_buffer), "%H:%M", time_now);
+            _data.last_clock_update = current_time;
+        }
+        
+        // 每次绘制都显示时间 (使用缓存的时间字符串)
+        HAL::GetCanvas()->setTextColor(THEME_COLOR_LawnGreen);
+        HAL::GetCanvas()->setTextSize(2);
+        HAL::GetCanvas()->drawCenterString(_data.date_buffer, 120, 160);
+        HAL::GetCanvas()->setTextSize(4);
+        HAL::GetCanvas()->drawCenterString(_data.time_buffer, 120, 226);
+        HAL::GetCanvas()->setTextSize(1);
         
         // 更新屏幕
         HAL::CanvasUpdate();

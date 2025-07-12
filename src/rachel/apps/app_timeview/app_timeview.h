@@ -10,6 +10,7 @@
  */
 #include <mooncake.h>
 #include "../assets/icons/icons.h"
+#include "assets/icon_app_timeview.h"
 
 namespace MOONCAKE::APPS
 {
@@ -36,7 +37,7 @@ namespace MOONCAKE::APPS
     class AppTimeview_Packer : public APP_PACKER_BASE
     {
         std::string getAppName() override { return "Timeview"; }
-        void* getAppIcon() override { return (void*)image_data_icon_app_default; }
+        void* getAppIcon() override { return (void*)image_data_icon_app_timeview; }
         void* newApp() override { return new AppTimeview; }
         void deleteApp(void* app) override { delete (AppTimeview*)app; }
     };

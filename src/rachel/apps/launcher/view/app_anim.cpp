@@ -53,9 +53,14 @@ void Launcher::_play_app_anim(bool open)
             float progress = (float)(320 - anim_value) / (float)(320 - THEME_APP_ICON_WIDTH);
             progress = progress < 0.0f ? 0.0f : (progress > 1.0f ? 1.0f : progress); // 限制在0-1之间
             
-            // 加速颜色过渡：当progress超过0.6时就完全变浅色
-            float color_progress = progress / 0.6f;
-            color_progress = color_progress > 1.0f ? 1.0f : color_progress;
+            // 延迟颜色过渡：当progress超过0.8时才开始变浅色，让黑色持续更长时间
+            float color_progress = 0.0f;
+            if (progress > 0.4f) {
+                color_progress = (progress - 0.4f) / 0.4f; // 从0.8-1.0映射到0-1
+                if (color_progress > 1.0f) {
+                    color_progress = 1.0f;
+                }
+            }
             
             // 颜色插值：从 0x000000 (0,0,0) 到 0xEFEFEF (239,239,239)
             uint8_t r = (uint8_t)(239 * color_progress);
