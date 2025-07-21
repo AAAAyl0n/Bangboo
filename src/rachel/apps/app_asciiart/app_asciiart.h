@@ -10,6 +10,7 @@
  */
 #include <mooncake.h>
 #include "../assets/icons/icons.h"
+#include "assets/icon_app_asciiart.hpp"
 #include <cmath>
 #include <string>
 
@@ -59,7 +60,7 @@ namespace MOONCAKE::APPS
     class AppAsciiart_Packer : public APP_PACKER_BASE
     {
         std::string getAppName() override { return "Asciiart"; }
-        void* getAppIcon() override { return (void*)image_data_icon_app_default; }
+        void* getAppIcon() override { return (void*)image_data_icon_app_asciiart; }
         void* newApp() override { return new AppAsciiart; }
         void deleteApp(void *app) override { delete (AppAsciiart*)app; }
     };

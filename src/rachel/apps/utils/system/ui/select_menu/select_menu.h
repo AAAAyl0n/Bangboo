@@ -45,7 +45,7 @@ namespace SYSTEM::UI
             LVGL::LV_ANIM_PATH_t camera_anim_path = LVGL::ease_out;
             int32_t camera_anim_time = 400;
 
-            ItemsAlignment_t items_alignment = ALIGN_LEFT;
+            ItemsAlignment_t items_alignment = ALIGN_CENTER;
         };
 
     private:

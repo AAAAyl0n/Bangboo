@@ -136,7 +136,7 @@ void AppBangboo::updateExpressionSequence()
     unsigned long elapsed_time = _data.current_time - _data.sequence_start_time;
     
     if (_data.current_sequence_index == -1) {
-        if (elapsed_time >= 3000) {
+        if (elapsed_time >= 500) {
             // 开始循环序列
             _data.current_sequence_index = 0;
             _data.sequence_start_time = _data.current_time;
@@ -144,7 +144,7 @@ void AppBangboo::updateExpressionSequence()
             drawExpression(_data.current_expression);
         } else {
             // 启动动画：眨眼状态下颜色从黑色渐变到绿色
-            float progress = (float)elapsed_time / 3000.0f;
+            float progress = (float)elapsed_time / 500.0f;
             progress = progress > 1.0f ? 1.0f : progress;
             
             // 从黑色(0,0,0)到BANGBOO_EYE_COLOR的RGB插值

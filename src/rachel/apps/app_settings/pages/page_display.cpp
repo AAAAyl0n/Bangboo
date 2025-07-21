@@ -26,9 +26,10 @@ static void _handle_brightness_config()
     int brightness = HAL::GetDisplay()->getBrightness();
     bool is_changed = true;
 
-    Button btn_left(GAMEPAD::BTN_LEFT);
-    Button btn_right(GAMEPAD::BTN_RIGHT);
-    Button btn_ok(GAMEPAD::BTN_A);
+    // 使用新的三键配置
+    Button btn_left(GAMEPAD::BTN_SELECT);    // SELECT 键减少亮度
+    Button btn_right(GAMEPAD::BTN_RIGHT);    // RIGHT 键增加亮度
+    Button btn_ok(GAMEPAD::BTN_START);       // START 键确认
 
     std::string title;
     while (1)
@@ -81,7 +82,7 @@ void AppSettings::_page_display()
         std::vector<std::string> items = {"[DISPLAY]"};
 
         // Get button sound config
-        items.push_back("Brightness     " + std::to_string(HAL::GetSystemConfig().brightness));
+        items.push_back("Brightness  " + std::to_string(HAL::GetSystemConfig().brightness));
         items.push_back("Back");
 
         auto selected = _data.select_menu->waitResult(items);

@@ -1,55 +1,69 @@
 /**
  * @file progress_window.cpp
- * @author Forairaaaaa
- * @brief
+ * @author Bowen
+ * @brief 
  * @version 0.1
- * @date 2023-11-17
- *
- * @copyright Copyright (c) 2023
- *
+ * @date 2025-07-13
+ * 
+ * @copyright Copyright (c) 2025
+ * 
  */
 #include "progress_window.h"
 #include "../../../../../hal/hal.h"
 #include "../common/data_structs.hpp"
 #include "../../assets/theme/theme.h"
+#include "../../assets/fonts/fonts.h"
+#include <cmath>
+
 
 void SYSTEM::UI::ProgressWindow(std::string title, uint8_t progress, bool lightMode, bool useCanvas)
 {
-    lgfx::LGFXBase* display = nullptr;
-    if (useCanvas)
-        display = HAL::GetCanvas();
-    else
-        display = HAL::GetDisplay();
+    // 设置颜色方案：黑色背景
+    uint32_t background_color = THEME_COLOR_BLACK;
+    uint32_t text_color = THEME_COLOR_LIGHT;
+    uint32_t ring_bg_color = THEME_COLOR_DARK;
+    uint32_t ring_progress_color = THEME_COLOR_LIGHT; // 白色实心圆环
 
-    uint32_t color_light = THEME_COLOR_LIGHT;
-    uint32_t color_dark = THEME_COLOR_DARK;
-    if (lightMode)
-        std::swap(color_light, color_dark);
+    // Clear screen - 黑色背景
+    HAL::GetCanvas()->fillScreen(background_color);
 
-    // Clear screen
-    display->fillScreen(color_light);
-
-    // Draw title
-    display->setTextColor(color_dark, color_light);
-    display->drawCenterString(title.c_str(), display->width() / 2, display->height() / 4);
-
-    // Draw progress bar base
-    BasicShape_t progress_bar;
-    progress_bar.width = display->width() * 8 / 10;
-    progress_bar.height = display->height() / 4;
-    progress_bar.x = (display->width() - progress_bar.width) / 2;
-    progress_bar.y = display->height() / 2;
-    display->fillSmoothRoundRect(progress_bar.x, progress_bar.y, progress_bar.width, progress_bar.height, 10, color_dark);
-
-    // Draw progress bar
+    // 计算半圆环参数 - 在屏幕上半部分显示
+    int center_x = HAL::GetCanvas()->width() / 2;
+    int center_y = HAL::GetCanvas()->height() / 4 + 40; // 稍微下移一点给标题留空间
+    int radius = HAL::GetCanvas()->width() / 3; // 圆环半径
+    int ring_thickness = 8; // 圆环厚度
+    
+    // 限制进度值
     if (progress > 100)
         progress = 100;
-    display->fillSmoothRoundRect(progress_bar.x + 4,
-                                 progress_bar.y + 4,
-                                 (progress_bar.width - 8) * progress / 100,
-                                 progress_bar.height - 8,
-                                 10,
-                                 color_light);
+    
+    // 绘制半圆环背景 - 使用fillSmoothArc函数
+    HAL::GetCanvas()->fillSmoothArc(center_x, center_y, radius - ring_thickness, radius, 180, 360, ring_bg_color);
+    
+    // 绘制进度半圆环 (白色实心) - 使用fillSmoothArc函数，从左往右
+    if (progress > 0) {
+        float progress_angle = 180.0 * progress / 100.0; // 计算进度对应的角度
+        HAL::GetCanvas()->fillSmoothArc(center_x, center_y, radius - ring_thickness, radius, 180 , 180 + progress_angle, ring_progress_color);
+    }
 
-    // printf("progress x:%d y:%d w:%d h:%d\n", progress_bar.x, progress_bar.y, progress_bar.width, progress_bar.height);
+    // 在屏幕上半部分中间显示标题
+    HAL::GetCanvas()->setTextColor(text_color, background_color);
+    HAL::GetCanvas()->setFont(&fonts::Font0);
+    HAL::GetCanvas()->setTextSize(1);
+    HAL::GetCanvas()->drawCenterString(
+        title.c_str(), 
+        center_x,
+        center_y - 20  // 在半圆环上方显示标题
+    );
+    
+    // 在屏幕上半部分中间显示进度数值
+    char progress_text[8];
+    sprintf(progress_text, "%d%%", progress);
+    HAL::GetCanvas()->setTextSize(2);
+    HAL::GetCanvas()->drawCenterString(
+        progress_text, 
+        center_x,
+        center_y - 40  // 在标题上方显示百分比
+    );
 }
+

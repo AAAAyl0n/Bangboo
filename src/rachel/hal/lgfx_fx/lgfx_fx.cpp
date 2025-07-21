@@ -316,3 +316,101 @@ void LGFX_SpriteFx::fillSmoothTriangleFast(int32_t x0, int32_t y0, int32_t x1, i
     setColor(color);
     fillSmoothTriangleFast(x0, y0, x1, y1, x2, y2);
 }
+
+// 辅助函数：判断点是否在圆弧内
+bool isPointInArc(float px, float py, float cx, float cy, float r0, float r1, float angle0, float angle1)
+{
+    // 计算点到中心的距离和角度
+    float dx = px - cx;
+    float dy = py - cy;
+    float distance = sqrt(dx * dx + dy * dy);
+    
+    // 检查是否在半径范围内
+    if (distance < r0 || distance > r1) {
+        return false;
+    }
+    
+    // 计算角度 (0-360度)
+    float angle = atan2(dy, dx) * 180.0f / 3.14159265359f;
+    if (angle < 0) angle += 360.0f;
+    
+    // 处理角度跨越0度的情况
+    if (angle0 <= angle1) {
+        return (angle >= angle0 && angle <= angle1);
+    } else {
+        return (angle >= angle0 || angle <= angle1);
+    }
+}
+
+// 计算像素在圆弧中的覆盖度（高性能2x2采样）
+float calculateArcAlpha(int32_t px, int32_t py, float cx, float cy, float r0, float r1, float angle0, float angle1)
+{
+    const float step = 0.5f;  // 2x2采样
+    int inside_count = 0;
+    
+    // 2x2采样点
+    for (int sy = 0; sy < 2; sy++) {
+        for (int sx = 0; sx < 2; sx++) {
+            float sample_x = px + sx * step + 0.25f;
+            float sample_y = py + sy * step + 0.25f;
+            
+            if (isPointInArc(sample_x, sample_y, cx, cy, r0, r1, angle0, angle1)) {
+                inside_count++;
+            }
+        }
+    }
+    
+    return inside_count / 4.0f;  // 返回覆盖度 (0.0 到 1.0)
+}
+
+// 高性能平滑圆弧绘制函数
+void LGFX_SpriteFx::fillSmoothArc(int32_t x, int32_t y, int32_t r0, int32_t r1, float angle0, float angle1)
+{
+    // 确保参数正确
+    if (r0 > r1) {
+        std::swap(r0, r1);
+    }
+    
+    // 计算边界框
+    int32_t minX = x - r1 - 1;
+    int32_t maxX = x + r1 + 1;
+    int32_t minY = y - r1 - 1;
+    int32_t maxY = y + r1 + 1;
+    
+    // 限制在屏幕范围内
+    minX = std::max(minX, _clip_l);
+    maxX = std::min(maxX, _clip_r);
+    minY = std::max(minY, _clip_t);
+    maxY = std::min(maxY, _clip_b);
+    
+    uint32_t rgb888 = _write_conv.revert_rgb888(_color.raw);
+    
+    startWrite();
+    
+    // 对每个像素进行覆盖度计算
+    for (int32_t py = minY; py <= maxY; py++) {
+        for (int32_t px = minX; px <= maxX; px++) {
+            float alpha = calculateArcAlpha(px, py, (float)x, (float)y, (float)r0, (float)r1, angle0, angle1);
+            
+            if (alpha > 0.001f) {  // 有覆盖
+                if (alpha >= 0.999f) {
+                    // 完全覆盖，直接绘制
+                    writePixel(px, py);
+                } else {
+                    // 部分覆盖，使用alpha混合
+                    uint8_t alphaValue = (uint8_t)(alpha * 255);
+                    fillRectAlpha(px, py, 1, 1, alphaValue, rgb888);
+                }
+            }
+        }
+    }
+    
+    endWrite();
+}
+
+// 带颜色参数的重载版本
+void LGFX_SpriteFx::fillSmoothArc(int32_t x, int32_t y, int32_t r0, int32_t r1, float angle0, float angle1, uint32_t color)
+{
+    setColor(color);
+    fillSmoothArc(x, y, r0, r1, angle0, angle1);
+}

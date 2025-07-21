@@ -181,7 +181,7 @@ void AppAsciiart::onRunning()
         HAL::GetCanvas()->printf("Mode: %s", mode_name);
         
         HAL::GetCanvas()->setCursor(10, bottom_area_y + 25);
-        HAL::GetCanvas()->print("A: Switch  SELECT: Exit");
+        HAL::GetCanvas()->print("START: Switch  SELECT: Exit");
         
         // 更新时间缓存 (只在需要时更新)
         if (current_time - _data.last_clock_update >= _data.clock_update_interval) {

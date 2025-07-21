@@ -17,7 +17,7 @@ using namespace SYSTEM::UI;
 void SelectMenu::_create_menu(std::vector<std::string>& itemList)
 {
     // Create menu
-    _data.menu = new SMOOTH_MENU::Simple_Menu(HAL::GetCanvas()->width(), HAL::GetCanvas()->height());
+    _data.menu = new SMOOTH_MENU::Simple_Menu(HAL::GetCanvas()->width(), HAL::GetCanvas()->height()/240 * 110);
 
     // Push items into menu
     int text_width = 12;
@@ -84,8 +84,9 @@ int SelectMenu::waitResult(std::vector<std::string>& itemList)
     {
         if ((HAL::Millis() - _data.menu_update_count) > _config.menu_update_interval)
         {
-            // Update navigation
-            if (HAL::GetButton(GAMEPAD::BTN_UP) || HAL::GetButton(GAMEPAD::BTN_LEFT))
+            // Update navigation - 适应新的三键配置
+            // SELECT 键向上导航
+            if (HAL::GetButton(GAMEPAD::BTN_SELECT))
             {
                 if (!_data.menu_wait_button_released)
                 {
@@ -93,7 +94,8 @@ int SelectMenu::waitResult(std::vector<std::string>& itemList)
                     _data.menu_wait_button_released = true;
                 }
             }
-            else if (HAL::GetButton(GAMEPAD::BTN_DOWN) || HAL::GetButton(GAMEPAD::BTN_RIGHT))
+            // RIGHT 键向下导航
+            else if (HAL::GetButton(GAMEPAD::BTN_RIGHT))
             {
                 if (!_data.menu_wait_button_released)
                 {
@@ -102,12 +104,12 @@ int SelectMenu::waitResult(std::vector<std::string>& itemList)
                 }
             }
 
-            // If select
-            else if (HAL::GetButton(GAMEPAD::BTN_A) || HAL::GetButton(GAMEPAD::BTN_LEFT_STICK))
+            // START 键选择
+            else if (HAL::GetButton(GAMEPAD::BTN_START))
             {
                 _data.menu->getSelector()->pressed();
                 // Wait release
-                while (HAL::GetButton(GAMEPAD::BTN_A) || HAL::GetButton(GAMEPAD::BTN_LEFT_STICK))
+                while (HAL::GetButton(GAMEPAD::BTN_START))
                 {
                     _data.menu->update(HAL::Millis());
                     HAL::CanvasUpdate();

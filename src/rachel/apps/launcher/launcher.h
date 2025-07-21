@@ -44,8 +44,8 @@ namespace MOONCAKE::APPS
             
             // Auto startup
             bool auto_startup_enabled = true;
-            uint32_t auto_startup_delay = 5000;  // 5秒后自动启动
-            uint32_t startup_time = 0;
+            uint32_t auto_startup_delay = 10000;  // 10秒无操作后自动启动
+            uint32_t last_input_time = 0;  // 最后一次按钮操作时间
             std::string auto_startup_app_name = "Bangboo";  // 要自动启动的app名称
         };
         Data_t _data;

@@ -28,17 +28,17 @@
 #define HAL_PIN_PWR_HOLD 10
 
 // Gamepad
-#define HAL_PIN_GAMEPAD_LS 43
-#define HAL_PIN_GAMEPAD_UP 2
-#define HAL_PIN_GAMEPAD_DOWN 6
-#define HAL_PIN_GAMEPAD_LEFT 3
-#define HAL_PIN_GAMEPAD_RIGHT 5
-#define HAL_PIN_GAMEPAD_START 8
-#define HAL_PIN_GAMEPAD_SELECT 0
-#define HAL_PIN_GAMEPAD_X 1
-#define HAL_PIN_GAMEPAD_Y 8
-#define HAL_PIN_GAMEPAD_A 4
-#define HAL_PIN_GAMEPAD_B 7
+// #define HAL_PIN_GAMEPAD_LS 43     // 注释掉，不再使用
+// #define HAL_PIN_GAMEPAD_UP 2      // 注释掉，不再使用
+// #define HAL_PIN_GAMEPAD_DOWN 6    // 注释掉，不再使用
+// #define HAL_PIN_GAMEPAD_LEFT 3    // 注释掉，不再使用
+#define HAL_PIN_GAMEPAD_RIGHT 0    // 新板子 RIGHT 键对应 GPIO 0
+#define HAL_PIN_GAMEPAD_START 8     // 新板子 START 键对应 GPIO 8
+#define HAL_PIN_GAMEPAD_SELECT 21    // 新板子 SELECT 键对应 GPIO 21
+// #define HAL_PIN_GAMEPAD_X 1       // 注释掉，不再使用
+// #define HAL_PIN_GAMEPAD_Y 8       // 注释掉，不再使用（原来和START重复）
+// #define HAL_PIN_GAMEPAD_A 4       // 注释掉，不再使用
+// #define HAL_PIN_GAMEPAD_B 7       // 注释掉，不再使用
 
 // SD card
 #define HAL_PIN_SD_CS 15

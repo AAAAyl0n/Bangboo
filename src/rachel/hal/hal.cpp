@@ -100,11 +100,11 @@ tm* HAL::getLocalTime()
 
 bool HAL::getAnyButton()
 {
-    for (int i = GAMEPAD::BTN_START; i < GAMEPAD::GAMEPAD_BUTTON_NUM; i++)
-    {
-        if (getButton(static_cast<GAMEPAD::GamePadButton_t>(i)))
-            return true;
-    }
+    // 只检查保留的三个按键
+    if (getButton(GAMEPAD::BTN_SELECT) || 
+        getButton(GAMEPAD::BTN_START) || 
+        getButton(GAMEPAD::BTN_RIGHT))
+        return true;
     return false;
 }
 

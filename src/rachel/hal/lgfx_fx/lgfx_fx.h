@@ -36,6 +36,10 @@ public:
     void fillSmoothTriangleFast(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2);
     void fillSmoothTriangleFast(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t color);
 
+     // 高性能平滑圆弧绘制函数
+    void fillSmoothArc(int32_t x, int32_t y, int32_t r0, int32_t r1, float angle0, float angle1);
+    void fillSmoothArc(int32_t x, int32_t y, int32_t r0, int32_t r1, float angle0, float angle1, uint32_t color);
+
 private:
     // 辅助函数：计算点到直线的距离 Helper function: calculate distance from point to line
     float pointToLineDistance(int32_t px, int32_t py, int32_t x1, int32_t y1, int32_t x2, int32_t y2);

@@ -19,10 +19,10 @@ void SelectMenuRenderCb_AlignRight::renderCallback(const std::vector<SMOOTH_MENU
                                                    const SMOOTH_MENU::RenderAttribute_t& camera)
 {
     // Clear
-    HAL::GetCanvas()->fillScreen(THEME_COLOR_DARK);
+    HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
 
     // Render items
-    HAL::GetCanvas()->setTextColor(THEME_COLOR_LIGHT, THEME_COLOR_DARK);
+    HAL::GetCanvas()->setTextColor(THEME_COLOR_LIGHT, THEME_COLOR_BLACK);
     HAL::GetCanvas()->setTextSize(1);
     HAL::GetCanvas()->setTextDatum(textdatum_t::top_right);
     for (int i = 0; i < menuItemList.size(); i++)
