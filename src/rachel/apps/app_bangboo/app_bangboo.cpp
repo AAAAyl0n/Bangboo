@@ -86,15 +86,19 @@ void AppBangboo::drawExpression(ExpressionType_t expression)
             break;
             
         case EXPR_WINCE:
-            HAL::GetCanvas()->setColor(BANGBOO_EYE_COLOR);
             HAL::GetCanvas()->fillSmoothTriangle(95, 91, 33, 55, 33, 127, BANGBOO_EYE_COLOR);
             HAL::GetCanvas()->fillSmoothTriangle(73, 91, 33, 67.72, 33, 114.28, THEME_COLOR_BLACK);
             HAL::GetCanvas()->fillSmoothTriangle(145, 91, 207, 55, 207, 127, BANGBOO_EYE_COLOR);
             HAL::GetCanvas()->fillSmoothTriangle(167, 91, 207, 67.72, 207, 114.28, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothTriangle(33, 70, 33, 55, 53, 55, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothTriangle(33, 112, 33, 127, 53, 127, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothTriangle(207, 70, 207, 55, 187, 55, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothTriangle(207, 112, 207, 127, 187, 127, THEME_COLOR_BLACK);
+
+            HAL::GetCanvas()->fillSmoothTriangle(33, 73, 33, 55, 53, 55, THEME_COLOR_BLACK);
+            HAL::GetCanvas()->fillSmoothTriangle(33, 109, 33, 127, 53, 127, THEME_COLOR_BLACK);
+
+            HAL::GetCanvas()->fillSmoothTriangle(207, 73, 207, 55, 187, 55, THEME_COLOR_BLACK);
+            HAL::GetCanvas()->fillSmoothTriangle(207, 109, 207, 127, 187, 127, THEME_COLOR_BLACK);
+
+            HAL::GetCanvas()->fillTriangle(90, 55, 90, 127, 120, 91, THEME_COLOR_BLACK);
+            HAL::GetCanvas()->fillTriangle(150, 55, 150, 127, 120, 91, THEME_COLOR_BLACK);
             break;
     }
     
