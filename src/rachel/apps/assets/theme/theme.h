@@ -19,6 +19,7 @@
 #define THEME_COLOR_YELLOW (uint32_t)(0xFFFF00)
 #define THEME_COLOR_Cyan (uint32_t)(0x00FFFF)
 #define THEME_COLOR_NIGHT (uint32_t)(0x161616)
+#define THEME_COLOR_WHITE (uint32_t)(0xFFFFFF)
 
 #define THEME_APP_ICON_WIDTH 62
 #define THEME_APP_ICON_HEIGHT 62

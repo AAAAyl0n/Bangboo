@@ -22,7 +22,11 @@ void AppTimeview::onCreate() {
 }
 
 // Like setup()...
-void AppTimeview::onResume() { spdlog::info("{} onResume", getAppName()); }
+void AppTimeview::onResume() { 
+    spdlog::info("{} onResume", getAppName()); 
+    //HAL::LoadTextFont24();//为了防止阻塞
+    HAL::GetCanvas()->setFont(&fonts::Font0);
+}
 
 // Like loop()...
 void AppTimeview::onRunning()
@@ -31,7 +35,7 @@ void AppTimeview::onRunning()
     static unsigned long last_update_time = 0;
     const unsigned long update_interval = 500; // 0.5秒更新间隔
     
-    HAL::GetCanvas()->setFont(&fonts::Font0);
+    //
 
     
     // 检查按键SELECT退出

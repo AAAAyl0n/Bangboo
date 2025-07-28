@@ -33,7 +33,7 @@ void rachel_app_install_callback(MOONCAKE::Mooncake* mooncake)
     //mooncake->installApp(new MOONCAKE::APPS::AppScreencast_Packer);
     //mooncake->installApp(new MOONCAKE::APPS::AppRaylibgames_Packer);
     //mooncake->installApp(new MOONCAKE::APPS::AppMusic_Packer);
-    //mooncake->installApp(new MOONCAKE::APPS::AppGenshin_Packer);
+    mooncake->installApp(new MOONCAKE::APPS::AppGenshin_Packer);
     mooncake->installApp(new MOONCAKE::APPS::AppBangboo_Packer);
     mooncake->installApp(new MOONCAKE::APPS::AppTimeview_Packer);
     //mooncake->installApp(new MOONCAKE::APPS::AppImutest_Packer);

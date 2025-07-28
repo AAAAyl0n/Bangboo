@@ -45,6 +45,8 @@ namespace MOONCAKE::APPS
             int current_sequence_index = 0;
             int current_loop = 0;
             ExpressionType_t current_expression = EXPR_EYES;
+            unsigned long app_start_time = 0;  // app启动时间
+            bool gpio_low_set = false;         // GPIO是否已设为低电平
         };
         Data_t _data;
 
