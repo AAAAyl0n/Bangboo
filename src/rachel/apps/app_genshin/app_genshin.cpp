@@ -11,6 +11,7 @@
 #include "app_genshin.h"
 #include "spdlog/spdlog.h"
 #include "../../hal/hal.h"
+#include "../../hal/hal_rachel/hal_rachel.h"
 #include "../assets/theme/theme.h"
 #include "../utils/system/ui/ui.h"
 #ifdef ESP_PLATFORM
@@ -154,12 +155,44 @@ void AppGenshin::onCreate() {
     
     // 创建M5EchoBase实例
     echobase = new M5EchoBase(I2S_NUM_0);
-    
-    // 初始化音频硬件 - 使用设备引脚配置
-    echobase->init(SAMPLE_RATE /*采样率*/, 14 /*I2C SDA*/, 13 /*I2C SCL*/, 36 /*I2S DIN*/, 37 /*I2S WS*/, 38 /*I2S DOUT*/,
-              35 /*I2S BCK*/, Wire);
 
-    echobase->setSpeakerVolume(80);             // 音量设置 (0-100)，当前为80%
+    // 获取HAL的I2C总线实例
+    HAL_Rachel* hal_rachel = static_cast<HAL_Rachel*>(HAL::Get());
+    if (hal_rachel == nullptr) {
+        spdlog::error("无法获取HAL实例!");
+        delete echobase;
+        echobase = nullptr;
+        return;
+    }
+    
+    m5::I2C_Class* i2c_bus = hal_rachel->getI2C();
+    if (i2c_bus == nullptr) {
+        spdlog::error("无法获取I2C总线实例!");
+        delete echobase;
+        echobase = nullptr;
+        return;
+    }
+    
+    // 初始化音频硬件 - 使用设备引脚配置和HAL的I2C总线
+    bool init_success = echobase->init(
+        SAMPLE_RATE,    // 采样率
+        14,             // I2C SDA
+        13,             // I2C SCL  
+        36,             // I2S DIN
+        37,             // I2S WS
+        38,             // I2S DOUT
+        35,             // I2S BCK
+        i2c_bus         // HAL的I2C总线实例
+    );
+    
+    if (!init_success) {
+        spdlog::error("M5EchoBase初始化失败!");
+        delete echobase;
+        echobase = nullptr;
+        return;
+    }
+
+    echobase->setSpeakerVolume(70);             // 音量设置 (0-100)，当前为70%
     echobase->setMicGain(ES8311_MIC_GAIN_6DB);  // 设置麦克风增益
     echobase->setMute(false);  // 取消静音
     

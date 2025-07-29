@@ -9,9 +9,12 @@
  *
  */
 #include <mooncake.h>
-#include <M5EchoBase.h>
+#include "../../hal/hal_rachel/utils/m5unified/audio/M5EchoBase.h"
 #include <math.h>
 #include "assets/icon_app_genshin.hpp"
+
+// 前向声明
+class FS;
 
 namespace MOONCAKE::APPS
 {

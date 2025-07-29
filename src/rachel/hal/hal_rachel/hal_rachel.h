@@ -13,6 +13,7 @@
 #include "utils/m5unified/I2C_Class.hpp"
 #include "utils/m5unified/RTC8563_Class.hpp"
 #include "utils/m5unified/IMU_Class.hpp"
+// #include "utils/m5unified/audio/M5EchoBase.h"
 // #include "utils/m5unified/Speaker_Class.hpp"
 
 class HAL_Rachel : public HAL
@@ -85,4 +86,7 @@ public:
     void setBeepVolume(uint8_t volume) override;
     void loadSystemConfig() override;
     void saveSystemConfig() override;
+
+    // I2C bus access
+    inline m5::I2C_Class* getI2C() { return _i2c_bus; }
 };
