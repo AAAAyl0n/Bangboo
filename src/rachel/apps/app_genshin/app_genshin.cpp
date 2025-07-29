@@ -150,8 +150,16 @@ void AppGenshin::onCreate() {
         return;
     }
     
-    // 初始化 M5EchoBase
-    spdlog::info("正在初始化 M5EchoBase...");
+    // 检查M5EchoBase是否已经初始化
+    if (echobase != nullptr) {
+        spdlog::info("音频系统已存在，取消静音并复用");
+        echobase->setMute(false);  // 取消静音
+        echobase->setSpeakerVolume(70);  // 确保音量设置
+        return;
+    }
+    
+    // 首次初始化 M5EchoBase
+    spdlog::info("首次初始化 M5EchoBase...");
     
     // 创建M5EchoBase实例
     echobase = new M5EchoBase(I2S_NUM_0);
@@ -196,7 +204,7 @@ void AppGenshin::onCreate() {
     echobase->setMicGain(ES8311_MIC_GAIN_6DB);  // 设置麦克风增益
     echobase->setMute(false);  // 取消静音
     
-    spdlog::info("音频系统初始化完成！");
+    spdlog::info("音频系统首次初始化完成！");
 }
 
 void AppGenshin::onResume() { 
@@ -252,12 +260,13 @@ void AppGenshin::onRunning()
 void AppGenshin::onDestroy() { 
     spdlog::info("{} onDestroy", getAppName()); 
     
-    // 清理资源
+    // 只做静音处理，保持I2S驱动运行，避免重复初始化问题
     if (echobase != nullptr) {
-        echobase->setMute(true);  // 静音
-        delete echobase;
-        echobase = nullptr;
+        echobase->setMute(true);  // 静音，停止音频输出
+        spdlog::info("音频已静音，保持驱动运行状态");
+        // 注意：不删除echobase对象，让I2S驱动保持活跃状态
+        // 这样下次启动时不会出现"register I2S object to platform failed"错误
     }
     
-    spdlog::info("音频资源已清理");
+    spdlog::info("音频资源保持运行状态（推荐的硬件管理方式）");
 }
