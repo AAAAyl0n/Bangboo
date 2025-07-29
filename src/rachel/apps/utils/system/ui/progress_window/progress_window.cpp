@@ -11,8 +11,8 @@
 #include "progress_window.h"
 #include "../../../../../hal/hal.h"
 #include "../common/data_structs.hpp"
-#include "../../assets/theme/theme.h"
-#include "../../assets/fonts/fonts.h"
+#include "../../../../assets/theme/theme.h"
+#include "../../../../assets/fonts/fonts.h"
 #include <cmath>
 
 

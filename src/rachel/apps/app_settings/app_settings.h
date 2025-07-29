@@ -10,7 +10,7 @@
  */
 #include <mooncake.h>
 #include "assets/icon_app_settings.hpp"
-#include "../../utils/system/ui/ui.h"
+#include "../utils/system/ui/ui.h"
 
 namespace MOONCAKE::APPS
 {

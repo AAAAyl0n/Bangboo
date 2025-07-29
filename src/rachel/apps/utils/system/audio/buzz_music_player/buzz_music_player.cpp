@@ -10,7 +10,7 @@
  */
 #include <mooncake.h>
 #include "buzz_music_player.h"
-#include "../../../hal/hal.h"
+#include "../../../../../hal/hal.h"
 #ifdef ESP_PLATFORM
 #include <Arduino.h>
 #include <SD.h>

@@ -16,7 +16,7 @@
 */
 
 #include "button.h"
-#include "../../../hal/hal.h"
+#include "../../../../../hal/hal.h"
 
 using namespace SYSTEM::INPUTS;
 
