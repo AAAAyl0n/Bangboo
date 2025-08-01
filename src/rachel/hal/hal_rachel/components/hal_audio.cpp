@@ -104,15 +104,15 @@ void HAL_Rachel::_audioPlaybackTask(void* parameter)
         // 等待音频播放命令
         if (xQueueReceive(hal->_audio_queue, &command, portMAX_DELAY) == pdTRUE) {
             // 设置播放状态
-            hal->_is_audio_playing = true;
-            hal->_should_stop_audio = false;
+            //hal->_is_audio_playing = true;
+            //hal->_should_stop_audio = false;
             
             spdlog::info("开始播放音频: {}", command.filename);
             
             // 播放前取消静音
-            if (hal->_echobase != nullptr) {
-                hal->_echobase->setMute(false);
-            }
+            //if (hal->_echobase != nullptr) {
+            //    hal->_echobase->setMute(false);
+            //}
             
             // 播放音频文件
             bool success = _playWavFileInTask(*command.fs_ptr, command.filename);

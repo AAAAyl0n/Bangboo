@@ -93,7 +93,7 @@ public:
     HAL_Rachel() : _i2c_bus(nullptr), _rtc(nullptr), _imu(nullptr), 
                    _echobase(nullptr), _audio_task_handle(nullptr), 
                    _audio_queue(nullptr), _is_audio_playing(false), 
-                   _should_stop_audio(false), _audio_volume(70), _audio_muted(true)
+                   _should_stop_audio(false), _audio_volume(75), _audio_muted(false)
     {
     }
     ~HAL_Rachel()
