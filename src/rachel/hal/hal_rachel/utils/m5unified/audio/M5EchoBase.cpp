@@ -193,8 +193,16 @@ bool M5EchoBase::pi4ioe_init()
 
 bool M5EchoBase::setMute(bool mute)
 {
-    // PI4IOE register definitions
-    wire_write_byte(PI4IOE_ADDR, PI4IOE_REG_IO_OUT, mute ? 0x00 : 0xFF);
+    // 控制ES8311编解码器静音
+    if (es_handle != nullptr) {
+        es8311_voice_mute(es_handle, mute);
+    }
+    
+    // 控制NS4150B音频放大器使能引脚 (GPIO18)
+    // NS4150B CTRL引脚：HIGH=使能放大器, LOW=关闭放大器
+    pinMode(18, OUTPUT);
+    digitalWrite(18, mute ? LOW : HIGH);
+    
     return true;
 }
 

@@ -27,3 +27,6 @@ E (21470) I2S: register I2S object to platform failed
 [2025-07-29 00:52:55.996] [error] M5EchoBase初始化失败!
 [2025-07-29 00:52:55.996] [info] app: Genshin opened
 [2025-07-29 00:52:56.381] [info] Genshin onResume 退出app再次打开后就无法运行了，且不掉电重启时，会出现无法检测到SD卡的问题 @app_genshin.cpp  你觉得更好的做法是不是在系统启动的时候就一直开着音频驱动（i2s）
+
+
+没有装载SD卡或者SD卡未检测到的时候，就会出现炸扬声器的声音。请你推测原因。

@@ -82,11 +82,8 @@ void HAL_Rachel::_disp_init()
 }
 
 static const std::string _logo = R"(
-          ____        ___ ___  
-         | __ )      |_ _/ _ \ 
-         |  _ \       | | | | |
-         | |_) |  _   | | |_| |
-         |____/  (_) |___\___/ 
+          Marcel Group. Wanzhou
+          2067.12.05-2074.08.01
 )";
 
 void HAL_Rachel::_disp_logo()

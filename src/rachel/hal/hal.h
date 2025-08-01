@@ -35,15 +35,15 @@ namespace GAMEPAD
     {
         BTN_START = 0,
         BTN_SELECT,
-        BTN_UP,
-        BTN_LEFT,
+        //BTN_UP,
+        //BTN_LEFT,
         BTN_RIGHT,
-        BTN_DOWN,
-        BTN_X,
-        BTN_Y,
-        BTN_A,
-        BTN_B,
-        BTN_LEFT_STICK,
+        //BTN_DOWN,
+        //BTN_X,
+        //BTN_Y,
+        //BTN_A,
+        //BTN_B,
+        //BTN_LEFT_STICK,
         GAMEPAD_BUTTON_NUM,
     };
 } // namespace GAMEPAD
@@ -371,4 +371,57 @@ public:
      */
     static void UpdateSystemFromConfig() { Get()->updateSystemFromConfig(); }
     virtual void updateSystemFromConfig();
+
+    ///
+    /// Audio APIs
+    ///
+
+    /**
+     * @brief 播放WAV音频文件（异步）
+     * 
+     * @param filename SD卡上的WAV文件路径
+     * @return true 播放命令发送成功
+     * @return false 播放失败
+     */
+    static bool PlayWavFile(const char* filename) { return Get()->playWavFile(filename); }
+    virtual bool playWavFile(const char* filename) { return false; }
+
+    /**
+     * @brief 检查是否正在播放音频
+     * 
+     * @return true 正在播放
+     * @return false 未播放
+     */
+    static bool IsAudioPlaying() { return Get()->isAudioPlaying(); }
+    virtual bool isAudioPlaying() { return false; }
+
+    /**
+     * @brief 停止当前音频播放
+     */
+    static void StopAudioPlayback() { Get()->stopAudioPlayback(); }
+    virtual void stopAudioPlayback() {}
+
+    /**
+     * @brief 设置音频音量
+     * 
+     * @param volume 音量（0-100）
+     */
+    static void SetAudioVolume(uint8_t volume) { Get()->setAudioVolume(volume); }
+    virtual void setAudioVolume(uint8_t volume) {}
+
+    /**
+     * @brief 获取音频音量
+     * 
+     * @return uint8_t 当前音量（0-100）
+     */
+    static uint8_t GetAudioVolume() { return Get()->getAudioVolume(); }
+    virtual uint8_t getAudioVolume() { return 70; }
+
+    /**
+     * @brief 设置音频静音状态
+     * 
+     * @param mute true为静音，false为取消静音
+     */
+    static void SetAudioMute(bool mute) { Get()->setAudioMute(mute); }
+    virtual void setAudioMute(bool mute) {}
 };
