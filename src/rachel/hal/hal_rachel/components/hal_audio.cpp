@@ -104,8 +104,8 @@ void HAL_Rachel::_audioPlaybackTask(void* parameter)
         // 等待音频播放命令
         if (xQueueReceive(hal->_audio_queue, &command, portMAX_DELAY) == pdTRUE) {
             // 设置播放状态
-            //hal->_is_audio_playing = true;
-            //hal->_should_stop_audio = false;
+            hal->_is_audio_playing = true;
+            hal->_should_stop_audio = false;
             
             spdlog::info("开始播放音频: {}", command.filename);
             
@@ -113,14 +113,15 @@ void HAL_Rachel::_audioPlaybackTask(void* parameter)
             //if (hal->_echobase != nullptr) {
             //    hal->_echobase->setMute(false);
             //}
-            
+
+            //vTaskDelay(pdMS_TO_TICKS(20));
             // 播放音频文件
             bool success = _playWavFileInTask(*command.fs_ptr, command.filename);
             
             // 播放结束后恢复静音
-            if (hal->_echobase != nullptr) {
-                hal->_echobase->setMute(hal->_audio_muted);
-            }
+            //if (hal->_echobase != nullptr) {
+            //    hal->_echobase->setMute(hal->_audio_muted);
+            //}
             
             if (success) {
                 spdlog::info("音频播放完成");
@@ -280,8 +281,9 @@ bool HAL_Rachel::playWavFile(const char* filename)
         return false;
     }
     
+    // 检查SD卡状态，如果失败则尝试重新初始化
     if (!checkSdCard()) {
-        spdlog::error("SD卡未准备就绪");
+        spdlog::error("SD卡未准备就绪，无法播放音频");
         return false;
     }
     
