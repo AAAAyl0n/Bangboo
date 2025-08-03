@@ -73,7 +73,7 @@ void Launcher::_create_menu()
     ((LauncherRenderCallBack*)_data.menu_render_cb)->statusBarAnim.resetTime(HAL::Millis() + 1000);
 
     ((LauncherRenderCallBack*)_data.menu_render_cb)->bottomPanelAnim.resetTime(HAL::Millis());
-    ((LauncherRenderCallBack*)_data.menu_render_cb)->bottomPanelAnim.setAnim(LVGL::ease_out, 240, 158, 600);
+    ((LauncherRenderCallBack*)_data.menu_render_cb)->bottomPanelAnim.setAnim(LVGL::ease_out, 240, 210, 600);
 }
 
 void Launcher::_update_menu()
@@ -88,6 +88,7 @@ void Launcher::_update_menu()
         // SELECT 键向前导航
         if (HAL::GetButton(GAMEPAD::BTN_SELECT))
         {
+            HAL::PlayWavFile("/system_audio/Klick.wav");
             any_button_pressed = true;
             if (!_data.menu_wait_button_released)
             {
@@ -99,6 +100,7 @@ void Launcher::_update_menu()
         // RIGHT 键向后导航
         else if (HAL::GetButton(GAMEPAD::BTN_RIGHT))
         {
+            HAL::PlayWavFile("/system_audio/Klick.wav");
             any_button_pressed = true;
             if (!_data.menu_wait_button_released)
             {
@@ -119,7 +121,7 @@ void Launcher::_update_menu()
             // Get packer, apps are arranged by install order, so simply use index is ok
             auto app_packer = mcAppGetFramework()->getInstalledAppList()[selected_item];
             // spdlog::info("try create app: {}", app_packer->getAppName());
-
+            HAL::PlayWavFile("/system_audio/Enter.wav");
             // Try create and start app
             if (mcAppGetFramework()->createAndStartApp(app_packer))
             {

@@ -23,6 +23,7 @@ void AppPoweroff::onResume() { spdlog::info("{} onResume", getAppName()); }
 // Like loop()...
 void AppPoweroff::onRunning()
 {
+    HAL::Delay(100);
     HAL::PowerOff();
 }
 

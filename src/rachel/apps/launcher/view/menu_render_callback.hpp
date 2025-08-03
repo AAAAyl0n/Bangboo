@@ -74,11 +74,11 @@ public:
 
         // Render bottom panel
         /* --------------------------------------------------------------------------------------------- */
-        // HAL::GetCanvas()->pushImage(0, 158, 240, 82, image_data_launcher_bottom_panel);
+        // HAL::GetCanvas()->pushImage(0, 210, 240, 30, image_data_launcher_bottom_panel);
 
         // With anim
         _anim_value_buffer = bottomPanelAnim.getValue(HAL::Millis());
-        HAL::GetCanvas()->pushImage(0, _anim_value_buffer, 240, 82, image_data_launcher_bottom_panel);
+        HAL::GetCanvas()->pushImage(0, _anim_value_buffer, 240, 30, image_data_launcher_bottom_panel);
         /* --------------------------------------------------------------------------------------------- */
 
         // Render items (Icons)

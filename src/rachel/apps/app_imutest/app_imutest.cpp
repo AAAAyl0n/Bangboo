@@ -139,6 +139,16 @@ void AppImutest::onRunning()
                     // 摇晃持续足够时间，触发显示
                     _data.shakeState = SHAKE_TRIGGERED;
                     _data.triggerStartTime = currentTime;
+                    // 随机播放1s_1、1s_3、1s_4、1s_5中的一个音频
+                    {
+                        int idx = rand() % 3;
+                        const char* audio_files[] = {
+                            "/bangboo_audio/1s_1.wav",
+                            "/bangboo_audio/1s_4.wav",
+                            "/bangboo_audio/1s_5.wav"
+                        };
+                        HAL::PlayWavFile(audio_files[idx]);
+                    }
                     drawWince();  // 显示眯眼状态
                 } else if (_data.shakeIntensity < _data.SHAKE_THRESHOLD * 0.3f) {
                     // 摇晃强度太低，回到空闲状态

@@ -192,11 +192,11 @@ void AppAsciiart::onRunning()
         }
         
         // 每次绘制都显示时间 (使用缓存的时间字符串)
-        HAL::GetCanvas()->setTextColor(THEME_COLOR_LawnGreen);
+        HAL::GetCanvas()->setTextColor(TFT_WHITE);
         HAL::GetCanvas()->setTextSize(2);
         HAL::GetCanvas()->drawCenterString(_data.date_buffer, 120, 160);
         HAL::GetCanvas()->setTextSize(4);
-        HAL::GetCanvas()->drawCenterString(_data.time_buffer, 120, 226);
+        HAL::GetCanvas()->drawCenterString(_data.time_buffer, 120, 186);
         HAL::GetCanvas()->setTextSize(1);
         
         // 更新屏幕

@@ -55,7 +55,7 @@ bool HAL_Rachel::getButton(GAMEPAD::GamePadButton_t button)
         {
             _key_state_list[button] = true;
             //beep(600, 20);
-            HAL::PlayWavFile("/system_audio/Klick.wav");
+            //HAL::PlayWavFile("/system_audio/Klick.wav");
         }
 
         return true;

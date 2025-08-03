@@ -46,6 +46,8 @@ void RACHEL::Setup()
     // Create launcher
     _mooncake->createApp(launcher);
 
+    HAL::PlayWavFile("/system_audio/Home.wav");
+
     // 直接启动应用,这个方法是错误的，不符合启动器生命周期规律的
     //auto timeview_packer = new MOONCAKE::APPS::AppTimeview_Packer;
     //_mooncake->createAndStartApp(timeview_packer);
