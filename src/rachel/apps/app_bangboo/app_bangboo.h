@@ -1,6 +1,6 @@
 /**
  * @file app_bangboo.h
- * @author Forairaaaaa
+ * @author Bowen
  * @brief
  * @version 0.1
  * @date 2023-11-04

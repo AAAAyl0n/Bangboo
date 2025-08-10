@@ -177,10 +177,10 @@ void AppAsciiart::onRunning()
         int bottom_area_y = 110; // 调整位置为时间显示留空间
         const char* mode_name = (_data.pattern_type == 0) ? "chaos" : "waves";
         
-        HAL::GetCanvas()->setCursor(10, bottom_area_y + 10);
+        HAL::GetCanvas()->setCursor(10, bottom_area_y + 25);
         HAL::GetCanvas()->printf("Mode: %s", mode_name);
         
-        HAL::GetCanvas()->setCursor(10, bottom_area_y + 25);
+        HAL::GetCanvas()->setCursor(10, bottom_area_y + 30);
         HAL::GetCanvas()->print("START: Switch  SELECT: Exit");
         
         // 更新时间缓存 (只在需要时更新)

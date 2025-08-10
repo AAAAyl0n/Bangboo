@@ -38,6 +38,8 @@ namespace MOONCAKE::APPS
             const uint32_t menu_update_interval = 10;
             // const uint32_t menu_update_interval = 0;
             bool menu_wait_button_released = false;
+            // Block START until menu opening animation finishes
+            uint32_t menu_open_end_time = 0;
 
             // App open and close anim
             LVGL::Anim_Path app_anim;

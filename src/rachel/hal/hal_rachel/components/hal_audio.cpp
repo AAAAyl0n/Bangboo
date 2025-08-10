@@ -281,9 +281,13 @@ bool HAL_Rachel::playWavFile(const char* filename)
         return false;
     }
     
-    // 检查SD卡状态，如果失败则尝试重新初始化
-    if (!checkSdCard()) {
-        spdlog::error("SD卡未准备就绪，无法播放音频");
+    // 快速检查SD卡状态 - 简单且快速的检查方式
+    if (!SD.cardSize() || !SD.totalBytes()) {
+        spdlog::warn("SD卡不可用，跳过音频播放: {}", filename);
+        _audio_muted = true;
+        if (_echobase != nullptr) {
+            _echobase->setMute(true);
+        }
         return false;
     }
     

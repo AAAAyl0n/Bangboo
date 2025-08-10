@@ -39,6 +39,9 @@ void Launcher::_create_menu()
     cfg_menu.animTime_open = 1000;
     _data.menu->getMenu()->config(cfg_menu);
 
+    // Record when menu open animation ends to block START during opening
+    _data.menu_open_end_time = HAL::Millis() + cfg_menu.animTime_open;
+
     // Allow selector go loop
     _data.menu->setMenuLoopMode(true);
 
@@ -88,10 +91,10 @@ void Launcher::_update_menu()
         // SELECT 键向前导航
         if (HAL::GetButton(GAMEPAD::BTN_SELECT))
         {
-            HAL::PlayWavFile("/system_audio/Klick.wav");
             any_button_pressed = true;
             if (!_data.menu_wait_button_released)
             {
+                HAL::PlayWavFile("/system_audio/Klick.wav");
                 _data.menu->goLast();
                 _data.menu_wait_button_released = true;
             }
@@ -100,17 +103,17 @@ void Launcher::_update_menu()
         // RIGHT 键向后导航
         else if (HAL::GetButton(GAMEPAD::BTN_RIGHT))
         {
-            HAL::PlayWavFile("/system_audio/Klick.wav");
             any_button_pressed = true;
             if (!_data.menu_wait_button_released)
             {
+                HAL::PlayWavFile("/system_audio/Klick.wav");
                 _data.menu->goNext();
                 _data.menu_wait_button_released = true;
             }
         }
 
         // START 键打开应用
-        else if (HAL::GetButton(GAMEPAD::BTN_START))
+        else if (HAL::GetButton(GAMEPAD::BTN_START) && HAL::Millis() >= _data.menu_open_end_time)
         {
             any_button_pressed = true;
             auto selected_item = _data.menu->getSelector()->getTargetItem();
@@ -121,10 +124,10 @@ void Launcher::_update_menu()
             // Get packer, apps are arranged by install order, so simply use index is ok
             auto app_packer = mcAppGetFramework()->getInstalledAppList()[selected_item];
             // spdlog::info("try create app: {}", app_packer->getAppName());
-            HAL::PlayWavFile("/system_audio/Enter.wav");
             // Try create and start app
             if (mcAppGetFramework()->createAndStartApp(app_packer))
             {
+                HAL::PlayWavFile("/system_audio/Enter.wav");
                 spdlog::info("app: {} opened", app_packer->getAppName());
                 closeApp();
             }

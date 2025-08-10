@@ -120,6 +120,13 @@ namespace SMOOTH_MENU
 
         if (_anim_cntr.open.isFinished(currentTime))
         {
+            // Ensure items snap to their target positions when the opening
+            // animation has finished or was interrupted while app switched.
+            for (int i = 0; i < _item_list.size(); i++)
+            {
+                _item_list[i]->x = _item_list[i]->x_target + this->x;
+                _item_list[i]->y = _item_list[i]->y_target + this->y;
+            }
             return;
         }
 
