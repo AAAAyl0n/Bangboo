@@ -51,12 +51,6 @@ void RACHEL::Setup()
     // 直接启动应用,这个方法是错误的，不符合启动器生命周期规律的
     //auto timeview_packer = new MOONCAKE::APPS::AppTimeview_Packer;
     //_mooncake->createAndStartApp(timeview_packer);
-
-    //auto bangboo_packer = new MOONCAKE::APPS::AppBangboo_Packer;
-    //_mooncake->createAndStartApp(bangboo_packer);
-
-    //auto imutest_packer = new MOONCAKE::APPS::AppImutest_Packer;
-    //_mooncake->createAndStartApp(imutest_packer);
 }
 
 void RACHEL::Loop() { _mooncake->update(); }

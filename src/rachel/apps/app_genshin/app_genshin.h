@@ -11,6 +11,7 @@
 #include <mooncake.h>
 #include <math.h>
 #include "assets/icon_app_genshin.hpp"
+#include "gif_player.h"
 
 namespace MOONCAKE::APPS
 {
@@ -23,6 +24,8 @@ namespace MOONCAKE::APPS
     private:
         // 应用状态变量
         bool _audio_started;
+        // GIF 播放器
+        GifPlayer _gifPlayer;
         
     public:
         AppGenshin() : _audio_started(false) {}
