@@ -15,7 +15,9 @@
 #define THEME_COLOR_DARK (uint32_t)(0x020202)
 #define THEME_COLOR_DARK2 (uint32_t)(0x313131)
 #define THEME_COLOR_BLACK (uint32_t)(0x000000)
-#define THEME_COLOR_LawnGreen (uint32_t)(0x7FFF00)
+//#define THEME_COLOR_LawnGreen (uint32_t)(0x7FFF00)
+#define THEME_COLOR_LawnGreen (uint32_t)(0x00FF00)
+
 #define THEME_COLOR_YELLOW (uint32_t)(0xFFFF00)
 #define THEME_COLOR_Cyan (uint32_t)(0x00FFFF)
 #define THEME_COLOR_NIGHT (uint32_t)(0x161616)

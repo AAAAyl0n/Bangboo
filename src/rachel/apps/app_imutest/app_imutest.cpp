@@ -17,7 +17,7 @@
 
 using namespace MOONCAKE::APPS;
 
-static const auto BANGBOO_EYE_COLOR = THEME_COLOR_YELLOW;
+static const auto BANGBOO_EYE_COLOR = THEME_COLOR_LawnGreen;
 
 static void drawEyes()
 {

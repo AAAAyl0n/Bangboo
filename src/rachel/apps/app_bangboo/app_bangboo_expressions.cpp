@@ -39,9 +39,42 @@ static const AppBangboo::ExpressionSequence_t expression_sequence[] = {
 static const int SEQUENCE_LENGTH = sizeof(expression_sequence) / sizeof(expression_sequence[0]);
 static const int MAX_LOOPS = 100;
 
-void AppBangboo::drawExpression(ExpressionType_t expression)
+// 眨眼序列定义
+const AppBangboo::ExpressionSequence_t AppBangboo::single_blink_sequence[] = {
+    {AppBangboo::EXPR_BLINK, 100},  // 眨眼 0.1秒
+    {AppBangboo::EXPR_EYES, 0}      // 回到正常眼睛（持续时间0表示结束）
+};
+
+const AppBangboo::ExpressionSequence_t AppBangboo::double_blink_sequence[] = {
+    {AppBangboo::EXPR_BLINK, 100},  // 第一次眨眼 0.1秒
+    {AppBangboo::EXPR_EYES, 100},   // 正常眼睛 0.1秒
+    {AppBangboo::EXPR_BLINK, 100},  // 第二次眨眼 0.1秒
+    {AppBangboo::EXPR_EYES, 0}      // 回到正常眼睛（持续时间0表示结束）
+};
+
+// 新增：anger_sequence，包含 wince 1s，blink 0.1s，anger 2s
+const AppBangboo::ExpressionSequence_t AppBangboo::anger_sequence[] = {
+    {AppBangboo::EXPR_WINCE, 1000},   // 眯眼 1秒
+    {AppBangboo::EXPR_BLINK, 100},    // 眨眼 0.1秒
+    {AppBangboo::EXPR_ANGER, 4000},   // 愤怒 2秒
+    {AppBangboo::EXPR_ANGER, 0}        // 回到正常眼睛（持续时间0表示结束）
+};
+
+const int AppBangboo::SINGLE_BLINK_LENGTH = sizeof(AppBangboo::single_blink_sequence) / sizeof(AppBangboo::single_blink_sequence[0]);
+const int AppBangboo::DOUBLE_BLINK_LENGTH = sizeof(AppBangboo::double_blink_sequence) / sizeof(AppBangboo::double_blink_sequence[0]);
+const int AppBangboo::ANGER_SEQUENCE_LENGTH = sizeof(AppBangboo::anger_sequence) / sizeof(AppBangboo::anger_sequence[0]);
+
+void AppBangboo::drawALL(ExpressionType_t expression)
 {
     HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
+    drawExpression(expression);
+    HAL::CanvasUpdate();
+}
+
+
+void AppBangboo::drawExpression(ExpressionType_t expression)
+{
+    //HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
 
     switch (expression) {
         case EXPR_EYES:
@@ -99,7 +132,7 @@ void AppBangboo::drawExpression(ExpressionType_t expression)
             break;
     }
 
-    HAL::CanvasUpdate();
+    //HAL::CanvasUpdate();
 }
 
 void AppBangboo::drawBlinkWithColor(uint32_t color)
@@ -135,7 +168,7 @@ void AppBangboo::updateExpressionSequence()
             _data.current_sequence_index = 0;
             _data.sequence_start_time = _data.current_time;
             _data.current_expression = expression_sequence[0].expression;
-            drawExpression(_data.current_expression);
+            drawALL(_data.current_expression);
         } else {
             // 启动动画：眨眼状态下颜色从黑色渐变到绿色
             float progress = (float)elapsed_time / 500.0f;
@@ -175,9 +208,56 @@ void AppBangboo::updateExpressionSequence()
 
         // 更新当前表情并绘制
         _data.current_expression = expression_sequence[_data.current_sequence_index].expression;
-        drawExpression(_data.current_expression);
+        drawALL(_data.current_expression);
         _data.sequence_start_time = _data.current_time;
     }
 }
 
+void AppBangboo::startExpressionSequence(const ExpressionSequence_t* sequence, int sequence_length)
+{
+    _data.isPlayingSequence = true;
+    _data.currentSequence = sequence;
+    _data.currentSequenceLength = sequence_length;
+    _data.currentSequenceIndex = 0;
+    _data.sequenceStepStartTime = HAL::Millis();
+    
+    // 立即绘制第一个表情
+    if (sequence_length > 0) {
+        drawALL(sequence[0].expression);
+    }
+}
+
+void AppBangboo::updateExpressionSequencePlayback()
+{
+    if (!_data.isPlayingSequence || _data.currentSequence == nullptr) {
+        return;
+    }
+    
+    unsigned long currentTime = HAL::Millis();
+    unsigned long elapsed = currentTime - _data.sequenceStepStartTime;
+    
+    // 检查当前步骤是否完成
+    if (elapsed >= _data.currentSequence[_data.currentSequenceIndex].duration_ms) {
+        // 移动到下一个步骤
+        _data.currentSequenceIndex++;
+        
+        // 检查是否完成整个序列
+        if (_data.currentSequenceIndex >= _data.currentSequenceLength || 
+            _data.currentSequence[_data.currentSequenceIndex].duration_ms == 0) {
+            // 序列播放完成
+            _data.isPlayingSequence = false;
+            
+            // 如果有最后一个表情需要显示（持续时间为0）
+            if (_data.currentSequenceIndex < _data.currentSequenceLength &&
+                _data.currentSequence[_data.currentSequenceIndex].duration_ms == 0) {
+                drawALL(_data.currentSequence[_data.currentSequenceIndex].expression);
+            }
+            return;
+        }
+        
+        // 绘制下一个表情并更新时间
+        drawALL(_data.currentSequence[_data.currentSequenceIndex].expression);
+        _data.sequenceStepStartTime = currentTime;
+    }
+}
 
