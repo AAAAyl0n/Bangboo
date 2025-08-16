@@ -57,7 +57,7 @@ static void GIFDraw(GIFDRAW* pDraw)
     const int16_t dstX = s_gif_x + pDraw->iX;
     const int16_t dstY = s_gif_y + pDraw->iY + pDraw->y;
 
-    canvas->startWrite();
+    //canvas->startWrite();
 
     if (!hasTrans) {
         for (int x = 0; x < width; x++) {
@@ -75,7 +75,7 @@ static void GIFDraw(GIFDRAW* pDraw)
         canvas->pushImage(dstX, dstY, width, 1, line);
     }
 
-    canvas->endWrite();
+    //canvas->endWrite();
 }
 
 GifPlayer::GifPlayer()
@@ -113,7 +113,7 @@ void GifPlayer::update()
 
     unsigned long currentTime = millis();
     int actualDelay = delay_ms;
-    if (delay_ms < 16) actualDelay = 16;
+    if (delay_ms < 5) actualDelay = 5;
     if (delay_ms > 200) actualDelay = 200;
     unsigned long elapsed = currentTime - _lastFrameTime;
     if (elapsed < actualDelay) {

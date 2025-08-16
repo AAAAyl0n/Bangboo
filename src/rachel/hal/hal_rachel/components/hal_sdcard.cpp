@@ -20,7 +20,7 @@ void HAL_Rachel::_sdcard_init()
     spdlog::info("sd card init");
     HAL_LOG_INFO("sd card init");
 
-    if (!SD.begin(HAL_PIN_SD_CS, SPI))
+    if (!SD.begin(HAL_PIN_SD_CS, SPI, 60000000))
     {
         spdlog::warn("sd card init failed!");
         HAL_LOG_WARN("sd card init failed!");
