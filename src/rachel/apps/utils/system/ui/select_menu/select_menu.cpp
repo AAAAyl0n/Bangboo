@@ -17,7 +17,7 @@ using namespace SYSTEM::UI;
 void SelectMenu::_create_menu(std::vector<std::string>& itemList)
 {
     // Create menu
-    _data.menu = new SMOOTH_MENU::Simple_Menu(HAL::GetCanvas()->width(), HAL::GetCanvas()->height()/240 * 110);
+    _data.menu = new SMOOTH_MENU::Simple_Menu(HAL::GetCanvas()->width(), HAL::GetCanvas()->height()/240 * 90);
 
     // Push items into menu
     int text_width = 12;
@@ -25,7 +25,7 @@ void SelectMenu::_create_menu(std::vector<std::string>& itemList)
     for (int i = 0; i < itemList.size(); i++)
     {
         _data.menu->getMenu()->addItem(
-            itemList[i].c_str(), 10, 10 + (text_height + 5) * i, text_width * itemList[i].size(), text_height);
+            itemList[i].c_str(), 10, 20 + (text_height + 5) * i, text_width * itemList[i].size(), text_height);
     }
 
     // Set render callback

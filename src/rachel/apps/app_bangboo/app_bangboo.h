@@ -35,10 +35,12 @@ namespace MOONCAKE::APPS
         
     private:
         enum BangbooState_t {
-            STATE_SLEEPING,    // 睡眠状态
-
             STATE_PREIDLE,     // 空闲状态前
             STATE_IDLE,        // 空闲状态  
+
+            STATE_SLEEPING,    // 睡眠状态
+            STATE_POSTSLEEP,   // 睡眠状态后
+            STATE_SLEEPEND,   // 睡眠状态结束
 
             STATE_PREHAPPY,       // 开心状态
             STATE_HAPPY,       // 开心状态
@@ -50,12 +52,21 @@ namespace MOONCAKE::APPS
             STATE_PREANGER,    // 愤怒状态前
             STATE_ANGER,       // 愤怒状态
 
-            STATE_PREWINCE,    // 晕眩状态前
+            STATE_PREWINCE1,
+            STATE_PREWINCE2,    // 晕眩状态前
             STATE_WINCE,       // 晕眩状态
             STATE_POSTWINCE,  // 晕眩状态后
 
             STATE_PRESAD,      // 悲伤状态前
             STATE_SAD,         // 悲伤状态
+            STATE_POSTSAD,     // 悲伤状态后
+
+
+            STATE_CURIOUS,     // 好奇
+            STATE_DULL,         // 呆滞
+
+            STATE_SHAKED,      // 摇晃后
+            
         };
 
         enum ShakeState_t {
@@ -81,7 +92,7 @@ namespace MOONCAKE::APPS
             LVGL::Anim_Path statusBarAnim;         // 状态栏动画对象
             bool statusBarVisible = false;         // 状态栏是否可见
             uint32_t statusBarShowTime = 0;        // 状态栏显示时间
-            uint32_t statusBarDisplayDuration = 3000;  // 状态栏显示持续时间
+            uint32_t statusBarDisplayDuration = 3000;  // 状态栏默认显示持续时间
             bool statusBarAnimating = false;       // 是否正在动画中
             bool buttonPressed = false;            // 按钮状态追踪
 
@@ -90,9 +101,10 @@ namespace MOONCAKE::APPS
             uint32_t statusBarMessageExpire = 0;   // 消息过期时间（毫秒时间戳）；0 表示无消息
             
             // 状态机相关
-            BangbooState_t currentState = STATE_SLEEPING;  // 当前状态
+            BangbooState_t currentState = STATE_PREIDLE;  // 当前状态
             uint32_t stateStartTime = 0;                   // 状态开始时间
             uint32_t stateTimer = 0;                       // 状态持续时间
+            int sleepZLastIndex = -1;                      // 睡眠状态下“z/zz/zzz”循环上次索引
 
             // imu相关
             ShakeState_t shakeState = SHAKE_IDLE;    // 摇晃状态

@@ -20,8 +20,13 @@ using namespace MOONCAKE::APPS;
 void AppBangboo::CheckStatusBar() {
     // 检测START按键
     if (HAL::GetButton(GAMEPAD::BTN_START)) {
-        _data.statusBarDisplayDuration = 3000;//时间显示3s
-        _show_status_bar();
+        //_show_status_bar();
+        showStatusMessage("time", 3000);
+    }
+
+    if (HAL::GetButton(GAMEPAD::BTN_RIGHT)) {
+        //_show_status_bar();
+        showStatusMessage("Hi~", 3000);
     }
 
     if (_data.statusBarVisible && !_data.statusBarAnimating) {
@@ -43,7 +48,7 @@ void AppBangboo::onCreate() {
     _data.statusBarAnimating = false;
     
     // 初始化状态机
-    _data.currentState = STATE_SLEEPING;
+    _data.currentState = STATE_PREIDLE;
     _data.stateStartTime = HAL::Millis();
     _data.stateTimer = 0;
 }

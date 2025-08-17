@@ -96,10 +96,16 @@ void AppBangboo::showStatusMessage(const char* msg, uint32_t durationMs) {
     // 设定消息过期时间
     uint32_t now = HAL::Millis();
     uint32_t showDuration = durationMs == 0 ? _data.statusBarDisplayDuration : durationMs;
-    _data.statusBarDisplayDuration = showDuration;
+    _data.statusBarDisplayDuration = showDuration;  // 更新显示时长
     _data.statusBarMessageExpire = now + showDuration + 600;
 
-    // 触发状态栏显示或刷新显示时间
+    // 如果状态栏已可见且不在动画中，仅刷新显示时间，避免重复触发弹入动画
+    if (_data.statusBarVisible && !_data.statusBarAnimating) {
+        _data.statusBarShowTime = now;
+        return;
+    }
+
+    // 触发状态栏显示 
     _show_status_bar();
 }
 
@@ -145,13 +151,11 @@ void AppBangboo::_render_status_bar()
         // 决定显示内容：优先显示消息，否则显示时间
         const char* toShow = nullptr;
         uint32_t now = HAL::Millis();
-        if (_data.statusBarMessageExpire != 0 && now < _data.statusBarMessageExpire && !_data.statusBarMessage.empty()) {
-            toShow = _data.statusBarMessage.c_str();
-        } else {
-            // 消息过期或不存在，清空消息占位
-            _data.statusBarMessage.clear();
-            _data.statusBarMessageExpire = 0;
+
+        if(_data.statusBarMessage == "time") {
             toShow = _data.clock.c_str();
+        } else {
+            toShow = _data.statusBarMessage.c_str();
         }
 
         HAL::GetCanvas()->setTextSize(2);
@@ -162,7 +166,8 @@ void AppBangboo::_render_status_bar()
         if (_data.statusBarAnimating) {
             if (_data.statusBarAnim.isFinished(HAL::Millis())) {
                 _data.statusBarAnimating = false;
-                if (!_data.statusBarVisible) {
+                // 如果是隐藏动画结束，将状态栏标记为不可见
+                if (anim_value <= 0) {
                     _data.statusBarVisible = false;
                 }
             }
@@ -200,6 +205,7 @@ void AppBangboo::_hide_status_bar()
     }
 
     _data.statusBarAnimating = true;
+    // 注意：_data.statusBarVisible 将在隐藏动画结束时设置为 false
 
     // 设置上浮动画
     _data.statusBarAnim.setAnim(
