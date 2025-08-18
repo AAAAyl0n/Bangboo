@@ -27,6 +27,13 @@ void AppBangboo::CheckStatusBar() {
     if (HAL::GetButton(GAMEPAD::BTN_RIGHT)) {
         //_show_status_bar();
         showStatusMessage("Hi~", 3000);
+        // 随机播放两个音频中的一个
+        if (rand() % 2 == 0) {
+            HAL::PlayWavFile("/bangboo_audio/bada1.wav");
+        } else {
+            HAL::PlayWavFile("/bangboo_audio/bada2.wav");
+        }
+        changeState(STATE_PREHAPPY);   
     }
 
     if (_data.statusBarVisible && !_data.statusBarAnimating) {

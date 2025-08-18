@@ -17,11 +17,9 @@ using namespace SYSTEM::UI;
 
 void AppSettings::_page_power()
 {
-    std::vector<std::string> items = {"[POWER]", "Power Off", "Reboot", "Back"};
+    std::vector<std::string> items = {"[POWER]", "Power Off", "Back"};
 
     auto selected = _data.select_menu->waitResult(items);
     if (selected == 1)
         HAL::PowerOff();
-    else if (selected == 2)
-        HAL::Reboot();
 }

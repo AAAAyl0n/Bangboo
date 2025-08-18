@@ -43,21 +43,26 @@ void AppTimeview::onResume() {
 // Like loop()...
 void AppTimeview::onRunning()
 {
-    // 退出
-    if (HAL::GetButton(GAMEPAD::BTN_SELECT)) {
-        destroyApp();
-        return;
+    while(1){
+        // 退出
+        if (HAL::GetButton(GAMEPAD::BTN_SELECT)) {
+            destroyApp();
+            return;
+        }
+
+        // 输入与业务
+        _handleInputs();
+        _updateStopwatch();
+        _updateTimer();
+
+        // 渲染
+        _renderMain();
+        _renderPopup();
+        HAL::CanvasUpdate();
+        
+        HAL::Delay(10);
     }
-
-    // 输入与业务
-    _handleInputs();
-    _updateStopwatch();
-    _updateTimer();
-
-    // 渲染
-    _renderMain();
-    _renderPopup();
-    HAL::CanvasUpdate();
+    
 }
 
 void AppTimeview::onDestroy() { spdlog::info("{} onDestroy", getAppName()); }
