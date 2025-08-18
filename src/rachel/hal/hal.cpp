@@ -113,6 +113,9 @@ void HAL::updateSystemFromConfig()
     // Brightness
     _display->setBrightness(_config.brightness);
 
-    // Volume
-    setBeepVolume(_config.volume);
+    // Apply audio output volume/mute according to config
+    // Map stored 0~255 to actual 40~80 range used by codec
+    uint8_t actual_percent = static_cast<uint8_t>(40 + (_config.volume * 40 + 127) / 255);
+    setAudioVolume(actual_percent);
+    setAudioMute(_config.volume == 0);
 }

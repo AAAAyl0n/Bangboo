@@ -130,7 +130,7 @@ public:
         _imu_init();
         _fs_init();
         _sdcard_init();
-        _audio_init();  // 添加音频初始化
+        _audio_init();
         _system_config_init();
         _sum_up();
     }

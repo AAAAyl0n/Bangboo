@@ -8,29 +8,59 @@
 
 using namespace MOONCAKE::APPS;
 
-static void _format_ms_to_hhmmss_timer(uint32_t ms, char* out, size_t outlen)
+// 优化的时间缓存更新函数
+void AppTimeview::_updateTimeCache(Data_t::TimeCache_t& cache, uint32_t ms)
 {
-    uint32_t total = ms / 1000UL;
-    uint32_t hh = total / 3600UL;
-    uint32_t mm = (total % 3600UL) / 60UL;
-    uint32_t ss = total % 60UL;
-    snprintf(out, outlen, "%02u:%02u:%02u", (unsigned)hh, (unsigned)mm, (unsigned)ss);
+    // 只有毫秒值改变且超过阈值时才重新计算
+    uint32_t msThreshold = (&cache == &_data.stopwatchCache) ? 10 : 1000; // stopwatch需要分秒精度
+    
+    if (cache.lastMs == 0xFFFFFFFF || 
+        (ms > cache.lastMs && ms - cache.lastMs >= msThreshold) ||
+        (ms < cache.lastMs)) // 处理溢出或重置情况
+    {
+        cache.lastMs = ms;
+        uint32_t total_sec = ms / 1000UL;
+        
+        // 一次性计算所有时间单位，避免重复除法
+        cache.hh = total_sec / 3600UL;
+        uint32_t remainder = total_sec % 3600UL;
+        cache.mm = remainder / 60UL;
+        cache.ss = remainder % 60UL;
+        cache.centisec = (ms % 1000UL) / 10UL;
+        cache.needsUpdate = true;
+    }
+}
+
+const char* AppTimeview::_getFormattedTime(Data_t::TimeCache_t& cache, uint32_t ms, bool showCentisec)
+{
+    _updateTimeCache(cache, ms);
+    
+    if (cache.needsUpdate) {
+        if (showCentisec) {
+            snprintf(cache.timeStr, sizeof(cache.timeStr), "%02u:%02u:%02u.%02u", 
+                    (unsigned)cache.hh, (unsigned)cache.mm, (unsigned)cache.ss, (unsigned)cache.centisec);
+        } else {
+            snprintf(cache.timeStr, sizeof(cache.timeStr), "%02u:%02u:%02u", 
+                    (unsigned)cache.hh, (unsigned)cache.mm, (unsigned)cache.ss);
+        }
+        cache.needsUpdate = false;
+    }
+    
+    return cache.timeStr;
 }
 
 void AppTimeview::_renderTimer()
 {
-    uint32_t total = _data.timerRemainMs / 1000UL;
-    uint32_t hh = total / 3600UL;
-    uint32_t mm = (total % 3600UL) / 60UL;
-    uint32_t ss = total % 60UL;
+    // 使用缓存避免重复计算
+    _updateTimeCache(_data.timerCache, _data.timerRemainMs);
     
     char first_line[16];
     char second_line[16];
     
     // 第一排：TMR + 小时数
-    snprintf(first_line, sizeof(first_line), "TMR %02u", (unsigned)hh);
+    snprintf(first_line, sizeof(first_line), "TMR %02u", (unsigned)_data.timerCache.hh);
     // 第二排：分钟:秒
-    snprintf(second_line, sizeof(second_line), "%02u:%02u", (unsigned)mm, (unsigned)ss);
+    snprintf(second_line, sizeof(second_line), "%02u:%02u", (unsigned)_data.timerCache.mm, (unsigned)_data.timerCache.ss);
 
     HAL::GetCanvas()->setTextColor(THEME_COLOR_LawnGreen);
     HAL::GetCanvas()->setTextSize(2);

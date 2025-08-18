@@ -64,12 +64,22 @@ namespace MOONCAKE::APPS
             uint32_t swStartMs = 0;         // 最近一次开始时间
             uint32_t swAccumulatedMs = 0;   // 暂停累计时间
 
-            // TIMER（倒计时）
-            bool timerRunning = false;
-            uint32_t timerTotalMs = 0;      // 目标总时长
-            uint32_t timerRemainMs = 0;     // 剩余时间
-            bool timerWasRunning = false;    // 用于检测完成沿
-            uint32_t timerLastTickMs = 0;    // 计时器内部tick
+                    // TIMER（倒计时）
+        bool timerRunning = false;
+        uint32_t timerTotalMs = 0;      // 目标总时长
+        uint32_t timerRemainMs = 0;     // 剩余时间
+        bool timerWasRunning = false;    // 用于检测完成沿
+        uint32_t timerLastTickMs = 0;    // 计时器内部tick
+        
+        // 缓存的时间格式化结果，避免重复计算
+        struct TimeCache_t {
+            uint32_t lastMs = 0xFFFFFFFF;  // 上次计算的毫秒值
+            uint32_t hh = 0, mm = 0, ss = 0, centisec = 0;
+            char timeStr[16] = {0};         // 格式化字符串缓存
+            bool needsUpdate = true;
+        };
+        TimeCache_t timerCache;
+        TimeCache_t stopwatchCache;
         };
         Data_t _data;
 
@@ -96,6 +106,10 @@ namespace MOONCAKE::APPS
         void _updateStopwatch();
         void _updateTimer();
         void _enterTimerSettings();
+        
+        // 优化的时间计算函数
+        void _updateTimeCache(Data_t::TimeCache_t& cache, uint32_t ms);
+        const char* _getFormattedTime(Data_t::TimeCache_t& cache, uint32_t ms, bool showCentisec = false);
     };
 
     class AppTimeview_Packer : public APP_PACKER_BASE
