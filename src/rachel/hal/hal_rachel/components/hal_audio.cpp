@@ -15,6 +15,7 @@
 #include <FS.h>
 #include <SD.h>
 #include "driver/i2s.h"
+#include <LittleFS.h>
 
 // 静态成员，用于任务访问HAL实例
 static HAL_Rachel* g_hal_instance = nullptr;
@@ -281,15 +282,19 @@ bool HAL_Rachel::playWavFile(const char* filename)
         return false;
     }
     
-    // 快速检查SD卡状态 - 简单且快速的检查方式
-    if (!SD.cardSize() || !SD.totalBytes()) {
-        spdlog::warn("SD卡不可用，跳过音频播放: {}", filename);
-        _audio_muted = true;
-        if (_echobase != nullptr) {
-            _echobase->setMute(true);
-        }
+    // 选择文件系统：优先 SD 卡；不可用或文件不存在则回退 LittleFS
+    FS* selected_fs = nullptr;
+    if (LittleFS.exists(filename)) {
+        selected_fs = &LittleFS;
+    } else if (SD.cardSize() && SD.totalBytes() && SD.exists(filename)) {
+        selected_fs = &SD;
+    } else {
+        spdlog::warn("找不到音频文件: {} (LittleFS与SD均不存在)", filename);
         return false;
     }
+    // 记录将要使用的文件系统
+    const char* fs_name = (selected_fs == &SD) ? "SD" : "LittleFS";
+    spdlog::info("音频来自: {}", fs_name);
     
     // 检查是否正在播放
     if (isAudioPlaying()) {
@@ -301,7 +306,7 @@ bool HAL_Rachel::playWavFile(const char* filename)
     AudioCommand_t command;
     strncpy(command.filename, filename, sizeof(command.filename) - 1);
     command.filename[sizeof(command.filename) - 1] = '\0';
-    command.fs_ptr = &SD;  // 使用SD卡文件系统
+    command.fs_ptr = selected_fs;  // 使用已选择的文件系统
     
     // 发送命令到队列
     if (xQueueSend(_audio_queue, &command, pdMS_TO_TICKS(100)) != pdTRUE) {
