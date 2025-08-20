@@ -20,7 +20,7 @@ void HAL_Rachel::_sdcard_init()
     spdlog::info("sd card init");
     HAL_LOG_INFO("sd card init");
 
-    if (!SD.begin(HAL_PIN_SD_CS, SPI, 60000000))
+    if (!SD.begin(HAL_PIN_SD_CS, SPI, 20000000))
     {
         spdlog::warn("sd card init failed!");
         HAL_LOG_WARN("sd card init failed!");
@@ -28,8 +28,8 @@ void HAL_Rachel::_sdcard_init()
         return;
     }
 
-    spdlog::info("sd card size: {}G", SD.cardSize() / 1073741824);
-    HAL_LOG_INFO("sd card size: %ldG", SD.cardSize() / 1073741824);
+    spdlog::info("sd card size: {}MB", SD.cardSize() / 1048576);
+    HAL_LOG_INFO("sd card size: %ldMB", SD.cardSize() / 1048576);
     _is_sd_card_ready = true;
 }
 
