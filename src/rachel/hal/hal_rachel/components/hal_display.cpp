@@ -78,13 +78,10 @@ void HAL_Rachel::_disp_init()
 
     HAL_LOGGER_INIT();
     _disp_logo();
-    HAL_LOG_INFO("rachel init");
+    HAL_LOG_INFO("bangboo init");
 }
 
-static const std::string _logo = R"(
-          Marcel Group. Wanzhou
-          2067.12.05-2074.08.01
-)";
+static const std::string _logo = R"()";
 
 void HAL_Rachel::_disp_logo()
 {
