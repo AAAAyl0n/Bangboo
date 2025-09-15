@@ -7,11 +7,20 @@
 #include "spdlog/spdlog.h"
 #include "../../hal/hal.h"
 #include "../assets/theme/theme.h"
+#include "assets/Amillion_face.hpp"
 
 using namespace MOONCAKE::APPS;
 
-// 邦布眼睛颜色
-static const auto BANGBOO_EYE_COLOR = THEME_COLOR_LawnGreen;
+// 运行时根据型号决定眼睛颜色
+static inline uint32_t _get_eye_color_by_model(uint8_t model)
+{
+    // 0=Eous, 1=Amillion, 2=paperboo
+    if (model == 1)
+        return THEME_COLOR_WHITE;
+    if (model == 2)
+        return THEME_COLOR_YELLOW;
+    return THEME_COLOR_LawnGreen;
+}
 
 // Y轴偏移量（正值向下，负值向上）
 static const int Y_OFFSET = 0;
@@ -20,65 +29,137 @@ static const int Y_OFFSET = 0;
 void AppBangboo::drawExpression(ExpressionType_t expression)
 {
     //HAL::GetCanvas()->fillScreen(THEME_COLOR_BLACK);
+    uint8_t model = HAL::GetSystemConfig().model;
+    bool isAmillion = (model == 1);
+    bool isPaperboo = (model == 2);
+    uint32_t eyeColor = _get_eye_color_by_model(model);
+
+    // Amillion 叠加PNG底图
+    if (isAmillion)
+    {
+        HAL::GetCanvas()->drawPng(Amillion_face, sizeof(Amillion_face));
+    }
 
     switch (expression) {
         case EXPR_EYES:
-            HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 32, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+            if (isAmillion)
+            {
+                // 仅“角色右眼”（屏幕左侧）
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+            }
+            else
+            {
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+            }
             break;
 
         case EXPR_BLINK:
-            HAL::GetCanvas()->fillSmoothRoundRect(29, 86 + Y_OFFSET, 64, 11, 2, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothRoundRect(149, 86 + Y_OFFSET, 64, 11, 2, BANGBOO_EYE_COLOR);
+            if (isAmillion)
+            {
+                HAL::GetCanvas()->fillSmoothRoundRect(29, 86 + Y_OFFSET, 64, 11, 2, eyeColor);
+            }
+            else
+            {
+                HAL::GetCanvas()->fillSmoothRoundRect(29, 86 + Y_OFFSET, 64, 11, 2, eyeColor);
+                HAL::GetCanvas()->fillSmoothRoundRect(149, 86 + Y_OFFSET, 64, 11, 2, eyeColor);
+            }
             break;
 
         case EXPR_SMILE:
-            HAL::GetCanvas()->setColor(BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillArc(60, 150 + Y_OFFSET, 61, 71, 241, 299);
-            HAL::GetCanvas()->fillArc(180, 150 + Y_OFFSET, 61, 71, 241, 299);
+            HAL::GetCanvas()->setColor(eyeColor);
+            if (isAmillion)
+            {
+                HAL::GetCanvas()->fillArc(60, 150 + Y_OFFSET, 61, 71, 241, 299);
+            }
+            else
+            {
+                HAL::GetCanvas()->fillArc(60, 150 + Y_OFFSET, 61, 71, 241, 299);
+                HAL::GetCanvas()->fillArc(180, 150 + Y_OFFSET, 61, 71, 241, 299);
+            }
             break;
 
         case EXPR_ANGER:
-            HAL::GetCanvas()->setColor(BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 32, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillTriangle(0, 30 + Y_OFFSET, 60, 91 + Y_OFFSET, 150, 91 + Y_OFFSET, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillTriangle(240, 30 + Y_OFFSET, 180, 91 + Y_OFFSET, 90, 91 + Y_OFFSET, THEME_COLOR_BLACK);
+            HAL::GetCanvas()->setColor(eyeColor);
+            if (isAmillion)
+            {
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+                // Amillion 不画额外三角
+            }
+            else
+            {
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillTriangle(0, 30 + Y_OFFSET, 60, 91 + Y_OFFSET, 150, 91 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillTriangle(240, 30 + Y_OFFSET, 180, 91 + Y_OFFSET, 90, 91 + Y_OFFSET, THEME_COLOR_BLACK);
+            }
             break;
 
         case EXPR_SAD:
-            HAL::GetCanvas()->setColor(BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 32, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillTriangle(20, 91 + Y_OFFSET, 50, 0 + Y_OFFSET, 100, 70 + Y_OFFSET, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillTriangle(220, 91 + Y_OFFSET, 190, 0 + Y_OFFSET, 140, 70 + Y_OFFSET, THEME_COLOR_BLACK);
+            HAL::GetCanvas()->setColor(eyeColor);
+            if (isAmillion)
+            {
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillTriangle(20, 91 + Y_OFFSET, 50, 0 + Y_OFFSET, 100, 70 + Y_OFFSET, THEME_COLOR_BLACK);
+            }
+            else
+            {
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(60, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 32, eyeColor);
+                HAL::GetCanvas()->fillSmoothCircle(180, 91 + Y_OFFSET, 21, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillTriangle(20, 91 + Y_OFFSET, 50, 0 + Y_OFFSET, 100, 70 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillTriangle(220, 91 + Y_OFFSET, 190, 0 + Y_OFFSET, 140, 70 + Y_OFFSET, THEME_COLOR_BLACK);
+            }
             break;
 
         case EXPR_WINCE:
-            HAL::GetCanvas()->fillSmoothTriangle(95, 91 + Y_OFFSET, 33, 55 + Y_OFFSET, 33, 127 + Y_OFFSET, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothTriangle(73, 91 + Y_OFFSET, 33, 67.72 + Y_OFFSET, 33, 114.28 + Y_OFFSET, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothTriangle(145, 91 + Y_OFFSET, 207, 55 + Y_OFFSET, 207, 127 + Y_OFFSET, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothTriangle(167, 91 + Y_OFFSET, 207, 67.72 + Y_OFFSET, 207, 114.28 + Y_OFFSET, THEME_COLOR_BLACK);
+            if (isAmillion)
+            {
+                // 单眼的斜眼表情与遮挡
+                HAL::GetCanvas()->fillSmoothTriangle(95, 91 + Y_OFFSET, 33, 55 + Y_OFFSET, 33, 127 + Y_OFFSET, eyeColor);
+                HAL::GetCanvas()->fillSmoothTriangle(73, 91 + Y_OFFSET, 33, 67.72 + Y_OFFSET, 33, 114.28 + Y_OFFSET, THEME_COLOR_BLACK);
 
-            HAL::GetCanvas()->fillSmoothTriangle(33, 73 + Y_OFFSET, 33, 55 + Y_OFFSET, 53, 55 + Y_OFFSET, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothTriangle(33, 109 + Y_OFFSET, 33, 127 + Y_OFFSET, 53, 127 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothTriangle(33, 73 + Y_OFFSET, 33, 55 + Y_OFFSET, 53, 55 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothTriangle(33, 109 + Y_OFFSET, 33, 127 + Y_OFFSET, 53, 127 + Y_OFFSET, THEME_COLOR_BLACK);
 
-            HAL::GetCanvas()->fillSmoothTriangle(207, 73 + Y_OFFSET, 207, 55 + Y_OFFSET, 187, 55 + Y_OFFSET, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillSmoothTriangle(207, 109 + Y_OFFSET, 207, 127 + Y_OFFSET, 187, 127 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillTriangle(90, 55 + Y_OFFSET, 90, 127 + Y_OFFSET, 120, 91 + Y_OFFSET, THEME_COLOR_BLACK);
+            }
+            else
+            {
+                HAL::GetCanvas()->fillSmoothTriangle(95, 91 + Y_OFFSET, 33, 55 + Y_OFFSET, 33, 127 + Y_OFFSET, eyeColor);
+                HAL::GetCanvas()->fillSmoothTriangle(73, 91 + Y_OFFSET, 33, 67.72 + Y_OFFSET, 33, 114.28 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothTriangle(145, 91 + Y_OFFSET, 207, 55 + Y_OFFSET, 207, 127 + Y_OFFSET, eyeColor);
+                HAL::GetCanvas()->fillSmoothTriangle(167, 91 + Y_OFFSET, 207, 67.72 + Y_OFFSET, 207, 114.28 + Y_OFFSET, THEME_COLOR_BLACK);
 
-            HAL::GetCanvas()->fillTriangle(90, 55 + Y_OFFSET, 90, 127 + Y_OFFSET, 120, 91 + Y_OFFSET, THEME_COLOR_BLACK);
-            HAL::GetCanvas()->fillTriangle(150, 55 + Y_OFFSET, 150, 127 + Y_OFFSET, 120, 91 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothTriangle(33, 73 + Y_OFFSET, 33, 55 + Y_OFFSET, 53, 55 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothTriangle(33, 109 + Y_OFFSET, 33, 127 + Y_OFFSET, 53, 127 + Y_OFFSET, THEME_COLOR_BLACK);
+
+                HAL::GetCanvas()->fillSmoothTriangle(207, 73 + Y_OFFSET, 207, 55 + Y_OFFSET, 187, 55 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillSmoothTriangle(207, 109 + Y_OFFSET, 207, 127 + Y_OFFSET, 187, 127 + Y_OFFSET, THEME_COLOR_BLACK);
+
+                HAL::GetCanvas()->fillTriangle(90, 55 + Y_OFFSET, 90, 127 + Y_OFFSET, 120, 91 + Y_OFFSET, THEME_COLOR_BLACK);
+                HAL::GetCanvas()->fillTriangle(150, 55 + Y_OFFSET, 150, 127 + Y_OFFSET, 120, 91 + Y_OFFSET, THEME_COLOR_BLACK);
+            }
             break;
         
         case EXPR_SLEEP:
-            HAL::GetCanvas()->fillSmoothRoundRect(29, 86 + Y_OFFSET, 64, 11, 2, BANGBOO_EYE_COLOR);
-            HAL::GetCanvas()->fillSmoothRoundRect(149, 86 + Y_OFFSET, 64, 11, 2, BANGBOO_EYE_COLOR);
+            if (isAmillion)
+            {
+                HAL::GetCanvas()->fillSmoothRoundRect(29, 86 + Y_OFFSET, 64, 11, 2, eyeColor);
+            }
+            else
+            {
+                HAL::GetCanvas()->fillSmoothRoundRect(29, 86 + Y_OFFSET, 64, 11, 2, eyeColor);
+                HAL::GetCanvas()->fillSmoothRoundRect(149, 86 + Y_OFFSET, 64, 11, 2, eyeColor);
+            }
             break;
     }
 
