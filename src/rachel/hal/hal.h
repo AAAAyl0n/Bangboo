@@ -58,6 +58,8 @@ namespace CONFIG
     {
         uint8_t brightness = 127;
         uint8_t volume = 127;
+        // 设备型号：0=Eous, 1=Amillion, 2=paperboo
+        uint8_t model = 0;
     };
 } // namespace CONFIG
 

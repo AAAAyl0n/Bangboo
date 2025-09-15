@@ -81,8 +81,15 @@ void AppSettings::_page_display()
     {
         std::vector<std::string> items = {"[DISPLAY]"};
 
-        // Get button sound config
+        // Brightness
         items.push_back("Brightness  " + std::to_string(HAL::GetSystemConfig().brightness));
+
+        // Device model select
+        const char* model_names[] = {"Eous", "Amillion", "paperboo"};
+        uint8_t model = HAL::GetSystemConfig().model;
+        if (model > 2) model = 0;
+        items.push_back(std::string("Device   ") + model_names[model]);
+
         items.push_back("Back");
 
         auto selected = _data.select_menu->waitResult(items);
@@ -92,6 +99,17 @@ void AppSettings::_page_display()
         {
             _handle_brightness_config();
             _data.is_config_changed = true;
+        }
+        // Device model select
+        else if (selected == 2)
+        {
+            std::vector<std::string> select_items = {"[DEVICE]", "Eous", "Amillion", "paperboo", "Back"};
+            auto choose = _data.select_menu->waitResult(select_items);
+            if (choose >= 1 && choose <= 3)
+            {
+                HAL::GetSystemConfig().model = static_cast<uint8_t>(choose - 1);
+                _data.is_config_changed = true;
+            }
         }
         else
             break;

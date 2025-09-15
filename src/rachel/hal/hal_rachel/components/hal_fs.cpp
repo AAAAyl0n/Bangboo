@@ -55,6 +55,10 @@ void HAL_Rachel::loadSystemConfig()
     // Copy configs
     _config.brightness = doc["brightness"];
     _config.volume = doc["volume"];
+    if (doc.containsKey("model"))
+        _config.model = doc["model"];
+    else
+        _config.model = 0; // 默认 Eous
 
     spdlog::info("get config:\nbrightness: {}\nvolume: {}", _config.brightness, _config.volume);
 
@@ -74,6 +78,7 @@ void HAL_Rachel::saveSystemConfig()
     DynamicJsonDocument doc(2048);
     doc["brightness"] = _config.brightness;
     doc["volume"] = _config.volume;
+    doc["model"] = _config.model;
 
     // Save file
     if (serializeJson(doc, config_file) == 0)
