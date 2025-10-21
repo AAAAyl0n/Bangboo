@@ -27,7 +27,7 @@ namespace MOONCAKE::APPS
         // GIF 播放器
         GifPlayer _gifPlayer;
         // GIF 文件路径数组
-        const char* _gifPaths[3] = {"/gif/dance.gif", "/gif/have.gif", "/gif/pixel.gif"};
+        const char* _gifPaths[3] = {"/gif/ASES2.gif", "/gif/ASES3.gif", "/gif/ASES4.gif"};
         // 当前播放的GIF索引
         int _currentGifIndex;
         // START键按下状态（防止重复触发）
@@ -44,7 +44,7 @@ namespace MOONCAKE::APPS
 
     class AppGenshin_Packer : public APP_PACKER_BASE
     {
-        std::string getAppName() override { return "Genshin"; }
+        std::string getAppName() override { return "ASES"; }
         void* getAppIcon() override { return (void*)image_data_icon_app_genshin; }
         void* newApp() override { return new AppGenshin; }
         void deleteApp(void* app) override { delete (AppGenshin*)app; }

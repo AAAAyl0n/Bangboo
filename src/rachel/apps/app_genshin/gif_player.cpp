@@ -1,5 +1,7 @@
 #include "gif_player.h"
 #include "../../hal/hal.h"
+#include <FS.h>
+#include <LittleFS.h>
 
 using namespace MOONCAKE::APPS;
 
@@ -11,6 +13,7 @@ static int s_gif_y = 0;
 static void* GIFOpenFile(const char* szFilename, int32_t* pFileSize)
 {
     File f = SD.open(szFilename, FILE_READ);
+    //File f = LittleFS.open(szFilename, FILE_READ);
     if (!f) return nullptr;
     File* handle = new File(f);
     *pFileSize = f.size();
@@ -83,7 +86,6 @@ GifPlayer::GifPlayer()
 
 bool GifPlayer::open(const char* path, int x, int y)
 {
-    if (!HAL::CheckSdCard()) return false;
     setPosition(x, y);
     _gif.begin(BIG_ENDIAN_PIXELS);
     if (_gif.open(path, GIFOpenFile, GIFCloseFile, GIFReadFile, GIFSeekFile, GIFDraw)) {
