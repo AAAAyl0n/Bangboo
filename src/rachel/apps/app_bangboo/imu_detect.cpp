@@ -47,7 +47,6 @@ void AppBangboo::imu_detection()
             break;
             
         case SHAKE_TRIGGERED:
-            // 眯眼流程完成（处于POSTWINCE）后，复位摇晃状态
             if (_data.currentState ==  STATE_SHAKED) {
                 _data.shakeState = SHAKE_IDLE;
                 _data.shakeIntensity = 0.0f;

@@ -41,6 +41,7 @@ private:
     volatile bool _should_stop_audio;
     uint8_t _audio_volume;
     bool _audio_muted;
+    int _audio_sample_rate;
     
     // 音频播放命令结构
     struct AudioCommand_t {
@@ -93,7 +94,8 @@ public:
     HAL_Rachel() : _i2c_bus(nullptr), _rtc(nullptr), _imu(nullptr), 
                    _echobase(nullptr), _audio_task_handle(nullptr), 
                    _audio_queue(nullptr), _is_audio_playing(false), 
-                   _should_stop_audio(false), _audio_volume(71), _audio_muted(false)
+                   _should_stop_audio(false), _audio_volume(71), _audio_muted(false),
+                   _audio_sample_rate(48000)
     {
     }
     ~HAL_Rachel()
@@ -157,6 +159,18 @@ public:
     void setAudioVolume(uint8_t volume) override;
     uint8_t getAudioVolume() override;
     void setAudioMute(bool mute) override;
+
+    // 录音相关（保存为原始PCM数据到SD卡）
+    bool recordPcmToSd(const char* filename, int durationSeconds);
+    int getRecordBufferSize(int durationSeconds);
+    // 录音到SD卡WAV文件（带WAV头）
+    bool recordWavToSd(const char* filename, int durationSeconds);
+
+    // 非阻塞WAV录音：开始/步进/停止
+    bool startWavRecording(const char* filename);
+    bool recordWavStep(size_t chunkBytes = 8192);
+    bool stopWavRecording();
+    bool isWavRecording();
 
     // I2C bus access
     inline m5::I2C_Class* getI2C() { return _i2c_bus; }

@@ -16,9 +16,15 @@
 #include <SD.h>
 #include "driver/i2s.h"
 #include <LittleFS.h>
+#include <FS.h>
 
 // 静态成员，用于任务访问HAL实例
 static HAL_Rachel* g_hal_instance = nullptr;
+
+// 非阻塞录音内部状态
+static bool s_is_recording = false;
+static size_t s_rec_written = 0;
+static File s_rec_file;
 
 void HAL_Rachel::_audio_init()
 {
@@ -37,6 +43,7 @@ void HAL_Rachel::_audio_init()
     
     // 初始化音频硬件 - 使用设备引脚配置和I2C总线
     const int SAMPLE_RATE = 48000;
+    _audio_sample_rate = SAMPLE_RATE;
     bool init_success = _echobase->init(
         SAMPLE_RATE,    // 采样率
         14,             // I2C SDA
@@ -57,7 +64,7 @@ void HAL_Rachel::_audio_init()
 
     // 设置音频参数
     _echobase->setSpeakerVolume(_audio_volume);        // 音量设置
-    _echobase->setMicGain(ES8311_MIC_GAIN_6DB);       // 设置麦克风增益
+    _echobase->setMicGain(ES8311_MIC_GAIN_0DB);       // 设置麦克风增益（降低以避免炸麦）
     _echobase->setMute(_audio_muted);                 // 设置静音状态
     
     // 创建FreeRTOS音频队列
@@ -349,3 +356,221 @@ void HAL_Rachel::setAudioMute(bool mute)
         _echobase->setMute(mute);
     }
 } 
+
+// 录音到SD卡原始PCM文件（无WAV头）
+bool HAL_Rachel::recordPcmToSd(const char* filename, int durationSeconds)
+{
+    if (_echobase == nullptr) {
+        spdlog::error("EchoBase 未初始化，无法录音");
+        return false;
+    }
+    if (!SD.cardSize() || !SD.totalBytes()) {
+        spdlog::error("SD卡不可用");
+        return false;
+    }
+
+    int size_bytes = _echobase->getBufferSize(durationSeconds);
+    spdlog::info("开始录音: {} 秒, 预计 {} 字节 -> {}", durationSeconds, size_bytes, filename);
+
+    // 静音扬声器，避免录音串入回放
+    _echobase->setMute(true);
+    bool ok = _echobase->record(SD, filename, size_bytes);
+    _echobase->setMute(_audio_muted);
+
+    if (!ok) {
+        spdlog::error("录音失败");
+    } else {
+        spdlog::info("录音完成: {}", filename);
+    }
+    return ok;
+}
+
+int HAL_Rachel::getRecordBufferSize(int durationSeconds)
+{
+    if (_echobase == nullptr) return 0;
+    return _echobase->getBufferSize(durationSeconds);
+}
+
+// 写WAV头到文件开头
+static bool _write_wav_header(File& file, uint32_t sample_rate, uint16_t channels, uint16_t bits_per_sample, uint32_t data_size)
+{
+    // RIFF chunk descriptor
+    file.seek(0);
+    // RIFF
+    file.write((const uint8_t*)"RIFF", 4);
+    uint32_t chunk_size = 36 + data_size; // 4 + (8 + SubChunk1Size) + (8 + SubChunk2Size)
+    file.write((uint8_t*)&chunk_size, 4);
+    file.write((const uint8_t*)"WAVE", 4);
+
+    // fmt subchunk
+    file.write((const uint8_t*)"fmt ", 4);
+    uint32_t subchunk1_size = 16; // PCM
+    uint16_t audio_format = 1; // PCM
+    uint32_t byte_rate = sample_rate * channels * (bits_per_sample / 8);
+    uint16_t block_align = channels * (bits_per_sample / 8);
+    file.write((uint8_t*)&subchunk1_size, 4);
+    file.write((uint8_t*)&audio_format, 2);
+    file.write((uint8_t*)&channels, 2);
+    file.write((uint8_t*)&sample_rate, 4);
+    file.write((uint8_t*)&byte_rate, 4);
+    file.write((uint8_t*)&block_align, 2);
+    file.write((uint8_t*)&bits_per_sample, 2);
+
+    // data subchunk
+    file.write((const uint8_t*)"data", 4);
+    file.write((uint8_t*)&data_size, 4);
+    return true;
+}
+
+bool HAL_Rachel::recordWavToSd(const char* filename, int durationSeconds)
+{
+    if (_echobase == nullptr) {
+        spdlog::error("EchoBase 未初始化，无法录音");
+        return false;
+    }
+    if (!SD.cardSize() || !SD.totalBytes()) {
+        spdlog::error("SD卡不可用");
+        return false;
+    }
+
+    const uint16_t channels = 2;
+    const uint16_t bits_per_sample = 16;
+    int pcm_size = _echobase->getBufferSize(durationSeconds, _audio_sample_rate);
+    if (pcm_size <= 0) {
+        spdlog::error("计算录音大小失败");
+        return false;
+    }
+
+    // 先创建文件并写占位头
+    File file = SD.open(filename, FILE_WRITE);
+    if (!file) {
+        spdlog::error("无法创建WAV文件: {}", filename);
+        return false;
+    }
+    // 预写头（数据大小暂为0）
+    _write_wav_header(file, _audio_sample_rate, channels, bits_per_sample, 0);
+
+    // 从当前偏移开始写入PCM数据
+    size_t header_size = 44; // 标准WAV头
+    file.seek(header_size);
+
+    // 录音：使用内部API录到临时缓冲区分片写入以避免超大内存
+    const size_t CHUNK = 8192;
+    uint8_t* buf = (uint8_t*)malloc(CHUNK);
+    if (!buf) {
+        spdlog::error("内存不足，无法分配缓冲区");
+        file.close();
+        SD.remove(filename);
+        return false;
+    }
+
+    // 静音扬声器，避免录音串音
+    _echobase->setMute(true);
+
+    size_t bytes_remaining = pcm_size;
+    size_t total_written = 0;
+    while (bytes_remaining > 0) {
+        size_t to_capture = bytes_remaining > CHUNK ? CHUNK : bytes_remaining;
+        size_t bytes_read = 0;
+        // 直接从I2S读取一片
+        esp_err_t err = i2s_read(I2S_NUM_0, buf, to_capture, &bytes_read, portMAX_DELAY);
+        if (err != ESP_OK) {
+            spdlog::error("录音I2S读取失败");
+            free(buf);
+            file.close();
+            SD.remove(filename);
+            _echobase->setMute(_audio_muted);
+            return false;
+        }
+        if (bytes_read > 0) {
+            file.write(buf, bytes_read);
+            total_written += bytes_read;
+            bytes_remaining -= bytes_read;
+        }
+    }
+
+    _echobase->setMute(_audio_muted);
+
+    // 回写正确的WAV头（包含正确data大小）
+    _write_wav_header(file, _audio_sample_rate, channels, bits_per_sample, (uint32_t)total_written);
+    file.close();
+
+    spdlog::info("WAV录音完成: {} ({} bytes)", filename, (int)total_written);
+    return true;
+}
+
+// 非阻塞WAV录音：开始/步进/停止
+bool HAL_Rachel::startWavRecording(const char* filename)
+{
+    if (_echobase == nullptr) {
+        spdlog::error("EchoBase 未初始化，无法录音");
+        return false;
+    }
+    if (!SD.cardSize() || !SD.totalBytes()) {
+        spdlog::error("SD卡不可用");
+        return false;
+    }
+    if (s_is_recording) {
+        spdlog::warn("录音已在进行中");
+        return false;
+    }
+
+    s_rec_file = SD.open(filename, FILE_WRITE);
+    if (!s_rec_file) {
+        spdlog::error("无法创建WAV文件: {}", filename);
+        return false;
+    }
+
+    // 预写WAV头（data_size=0），随后从偏移44开始写PCM
+    _write_wav_header(s_rec_file, _audio_sample_rate, 2, 16, 0);
+    s_rec_file.seek(44);
+
+    s_rec_written = 0;
+    s_is_recording = true;
+
+    _echobase->setMute(true);  // 录音期间静音扬声器，避免串音
+    spdlog::info("开始录音: {}", filename);
+    return true;
+}
+
+bool HAL_Rachel::recordWavStep(size_t chunkBytes)
+{
+    if (!s_is_recording) return false;
+    if (chunkBytes == 0) return true;
+
+    const size_t CHUNK = chunkBytes;
+    uint8_t* buf = (uint8_t*)malloc(CHUNK);
+    if (!buf) {
+        spdlog::error("recordWavStep: 内存不足");
+        return false;
+    }
+
+    size_t bytes_read = 0;
+    esp_err_t err = i2s_read(I2S_NUM_0, buf, CHUNK, &bytes_read, pdMS_TO_TICKS(50));
+    if (err == ESP_OK && bytes_read > 0) {
+        s_rec_file.write(buf, bytes_read);
+        s_rec_written += bytes_read;
+    }
+    free(buf);
+    return true;
+}
+
+bool HAL_Rachel::stopWavRecording()
+{
+    if (!s_is_recording) return false;
+
+    _echobase->setMute(_audio_muted);
+
+    // 回写正确WAV头，包含实际data大小
+    _write_wav_header(s_rec_file, _audio_sample_rate, 2, 16, (uint32_t)s_rec_written);
+    s_rec_file.close();
+
+    s_is_recording = false;
+    spdlog::info("录音结束，写入 {} 字节", (int)s_rec_written);
+    return true;
+}
+
+bool HAL_Rachel::isWavRecording()
+{
+    return s_is_recording;
+}

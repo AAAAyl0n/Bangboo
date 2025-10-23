@@ -21,18 +21,22 @@ void AppBangboo::updateStateMachine() {
     // 更新当前表情
     _data.currentExpression = getExpressionForState(_data.currentState);
     
-    // 全局高优先级：摇晃触发则无论当前在哪个普通状态，直接进入WINCE状态
-    if (_data.shakeState == SHAKE_TRIGGERED
-        && _data.currentState != STATE_SHAKED
-        && _data.currentState != STATE_PREWINCE1
-        && _data.currentState != STATE_PREWINCE2
-        && _data.currentState != STATE_WINCE
-        && _data.currentState != STATE_POSTWINCE
-        && _data.currentState != STATE_PRESAD
-        && _data.currentState != STATE_SAD
-        && _data.currentState != STATE_DULL) {
-        changeState(STATE_SHAKED);
-        return;
+    // 全局高优先级：仅在可中断的空闲类状态下响应摇晃
+    if (_data.shakeState == SHAKE_TRIGGERED) {
+        switch (_data.currentState) {
+            case STATE_IDLE:
+            case STATE_PREIDLE:
+            case STATE_BLINKING0:
+            case STATE_BLINKTEMP:
+            case STATE_BLINKING1:
+            case STATE_SLEEPING:
+            case STATE_POSTSLEEP:
+            case STATE_SLEEPEND:
+                changeState(STATE_SHAKED);
+                return;
+            default:
+                break;
+        }
     }
 
     // 状态转换逻辑
